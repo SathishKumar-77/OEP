@@ -1,0 +1,61 @@
+{% extends 'layouts/main.html' %}
+{% block content %}
+<div class="container-fluid mt-4">
+    <!-- First Row: Breadcrumb and Add Button -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{{ url_for('admin_dashboard') }}">Dashboard</a></li>
+                    <li class="breadcrumb-item active">Teacher Settings</li>
+                </ol>
+            </nav>
+        </div>
+        <div class="col-md-6 text-end">
+            <button class="btn btn-primary" onclick="openModal('addTeacher')">
+                <i class="bi bi-plus-circle"></i> Add Teacher
+            </button>
+        </div>
+    </div>
+
+    <!-- Second Row: DataTable -->
+    <div class="row">
+        <div class="col">
+            <div class="card">
+                <div class="card-body">
+                    <table id="teachersTable" class="table table-striped table-bordered table-responsive mt-3">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Department</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="actionModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalTitle"></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="modalContent"></div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Add these scripts before your custom JS -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+<!-- Include custom JS -->
+<script src="{{ url_for('static', filename='js/teacher_management.js') }}"></script>
+{% endblock %}

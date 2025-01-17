@@ -1,0 +1,226 @@
+
+:root {
+    --primary-color: #6a11cb;
+    --secondary-color: #9abfff;
+    --bg-light: #f4f6f9;
+    --text-dark: #333;
+}
+
+html, body {
+    height: 100%;
+    margin: 0;
+    overflow: hidden; /* Prevent overall page scrolling */
+}
+
+.dashboard-container {
+    display: flex;
+    height: 100vh;
+    max-height: 100vh;
+    overflow: hidden;
+}
+
+/* Sidebar Styling */
+.sidebar {
+    width: 250px;
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    color: white;
+    height: 100vh;
+    position: fixed;
+    top: 0;
+    left: 0;
+    transition: all 0.3s ease;
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto; /* Allow sidebar content to scroll if needed */
+}
+
+.sidebar.minimized {
+    width: 80px;
+}
+
+.sidebar.minimized .sidebar-nav-item {
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 15px 0;
+}
+
+.sidebar.minimized .sidebar-nav-item i {
+    margin-right: 0;
+    margin-bottom: 5px;
+}
+
+.sidebar.minimized .sidebar-nav-item span {
+    font-size: 0.7rem;
+    text-align: center;
+}
+
+.sidebar-header {
+    display: flex;
+    align-items: center;
+    padding: 15px;
+    background: rgba(0,0,0,0.1);
+}
+
+.profile-img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid rgba(255,255,255,0.3);
+}
+
+.sidebar-nav {
+    flex-grow: 1;
+    overflow-y: auto;
+}
+
+.sidebar-nav-item {
+    color: white;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    padding: 12px 20px;
+    transition: background-color 0.3s ease;
+}
+
+.sidebar-nav-item:hover,
+.sidebar-nav-item.active {
+    background-color: rgba(255,255,255,0.2);
+}
+
+.sidebar-nav-item i {
+    margin-right: 15px;
+    font-size: 1.2rem;
+}
+
+
+.sidebar-logout {
+    border-top: 1px solid rgba(255,255,255,0.2);
+    padding: 0px 15px 0px 15px;
+}
+
+/* Top Navbar Styling */
+.top-navbar {
+    margin-left: 250px;
+    width: calc(100% - 250px);
+    position: fixed;
+    top: 0;
+    right: 0;
+    z-index: 1000;
+    transition: all 0.3s ease;
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)) !important;
+    height: 60px;
+    display: flex;
+    align-items: center;
+}
+
+.top-navbar .navbar-brand {
+    display: flex;
+    align-items: center;
+}
+
+/* Main Content Styling */
+.main-content {
+    margin-left: 250px;
+    margin-top: 60px;
+    padding: 30px;
+    width: calc(100% - 250px);
+    transition: all 0.3s ease;
+    height: calc(100vh - 120px); /* Subtract navbar and footer height */
+    overflow-y: auto; /* Allow main content to scroll */
+}
+
+/* Footer Styling */
+.footer {
+    margin-left: 250px;
+    width: calc(100% - 250px);
+    transition: all 0.3s ease;
+    height: 53px;
+    display: flex;
+    align-items: center;
+    position: fixed;
+    bottom: 0;
+    right: 0;
+}
+
+/* Sidebar Toggle Button */
+.sidebar-toggle {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 1.5rem;
+    cursor: pointer;
+    margin-right: 15px;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .sidebar {
+        width: 0;
+        overflow: hidden;
+    }
+
+    .top-navbar,
+    .main-content,
+    .footer {
+        margin-left: 0;
+        width: 100%;
+    }
+}
+
+
+.dashboard-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+}
+
+.dashboard-card {
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    padding: 20px;
+    transition: transform 0.3s ease;
+}
+.modal-custom {
+    background: rgba(0,0,0,0.5);
+}
+
+
+
+/* Animation Keyframes */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+
+.dataTable {
+    width: 100% !important;
+    table-layout: auto; /* Ensure flexible column widths */
+}
+
+.dataTable thead th {
+    font-weight: 500; /* Adjust weight as needed (100-900) */
+    font-size: 1.1rem; /* Optional: Adjust font size if needed */
+}
+
+
+
+
+.dataTables_wrapper .dataTables_filter {
+    margin-bottom: 20px; /* Adjust the value as needed */
+}
+
+
+    .table th, .table td {
+        vertical-align: middle;
+        text-align: center;
+    }
+
+    #difficultyFilter {
+        min-width: 150px;
+    }
+
