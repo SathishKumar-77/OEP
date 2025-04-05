@@ -5,7 +5,7 @@
         <div class="card">
             <div class="card-body">
                 <h3 class="card-title mb-4">Create New Event</h3>
-                <form method="POST">
+                <form method="POST" id="eventForm">
                     <div class="row">
                         <!-- Left Column -->
                         <div class="col-md-6">
@@ -53,6 +53,22 @@
                                     <option value="4">Fourth Year</option>
                                 </select>
                                 <small class="form-text text-muted">Hold Ctrl/Cmd to select multiple years</small>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="exam_duration" class="form-label">Duration (minutes)</label>
+                                <input type="number" class="form-control" id="exam_duration" name="exam_duration" min="1" placeholder="e.g., 60">
+                            </div>
+                            <div class="mb-3">
+                                <label for="start_time" class="form-label">Start Time</label>
+                                <input type="text" class="form-control" id="start_time" name="start_time" placeholder="Select start time" readonly>
+                                <div id="startTimeError" class="text-danger" style="display: none;">Please select duration first</div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="end_time" class="form-label">End Time</label>
+                                <input type="text" class="form-control" id="end_time" name="end_time" placeholder="Select end time" readonly>
+                                <div id="endTimeError" class="text-danger" style="display: none;">Please select start time and duration first</div>
+                                <div id="durationError" class="text-danger" style="display: none;">End time doesn't match duration</div>
                             </div>
                         </div>
                         
@@ -119,11 +135,6 @@
                                     {% endfor %}
                                 </select>
                             </div>
-
-                            <div class="mb-3 exam-field" style="display: none;">
-                                <label for="exam_duration" class="form-label">Exam Duration (minutes)</label>
-                                <input type="number" class="form-control" id="exam_duration" name="exam_duration" min="1" placeholder="e.g., 60">
-                            </div>
                         </div>
                     </div>
                     
@@ -138,6 +149,10 @@
         </div>
     </div>
 </div>
+
+<!-- Add Flatpickr CSS and JS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 
 <style>
 select[multiple] {
@@ -167,6 +182,11 @@ select[multiple] {
     font-size: 0.875em;
 }
 
+.text-danger {
+    font-size: 0.875em;
+    margin-top: 0.25rem;
+}
+
 @media (max-width: 768px) {
     select[multiple] {
         height: 100px !important;
@@ -176,16 +196,111 @@ select[multiple] {
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('Event Create Script Loaded'); // Debug log
+    console.log('Event Create Script Loaded');
 
-    // Function to toggle additional fields
+    // Initialize Flatpickr
+    let startTimePicker, endTimePicker;
+    
+    const durationInput = document.getElementById('exam_duration');
+    const startTimeInput = document.getElementById('start_time');
+    const endTimeInput = document.getElementById('end_time');
+    const startTimeError = document.getElementById('startTimeError');
+    const endTimeError = document.getElementById('endTimeError');
+    const durationError = document.getElementById('durationError');
+
+    // Function to initialize time pickers with validation
+    function initializeTimePickers() {
+        startTimePicker = flatpickr('#start_time', {
+            enableTime: true,
+            noCalendar: true,
+            dateFormat: "H:i",
+            time_24hr: true,
+            onOpen: function() {
+                if (!durationInput.value) {
+                    startTimeError.style.display = 'block';
+                    startTimePicker.close();
+                    return false;
+                }
+                startTimeError.style.display = 'none';
+            },
+            onChange: function(selectedDates) {
+                if (durationInput.value && selectedDates[0]) {
+                    updateEndTime(selectedDates[0]);
+                }
+            }
+        });
+
+        endTimePicker = flatpickr('#end_time', {
+            enableTime: true,
+            noCalendar: true,
+            dateFormat: "H:i",
+            time_24hr: true,
+            onOpen: function() {
+                if (!durationInput.value || !startTimeInput.value) {
+                    endTimeError.style.display = 'block';
+                    endTimePicker.close();
+                    return false;
+                }
+                endTimeError.style.display = 'none';
+            },
+            onChange: validateDuration
+        });
+    }
+
+    // Function to update end time based on start time and duration
+    function updateEndTime(startDate) {
+        const duration = parseInt(durationInput.value);
+        if (duration && startDate) {
+            const endDate = new Date(startDate);
+            endDate.setMinutes(endDate.getMinutes() + duration);
+            endTimePicker.setDate(endDate);
+            validateDuration();
+        }
+    }
+
+    // Function to validate duration matches time difference
+    function validateDuration() {
+        if (startTimeInput.value && endTimeInput.value && durationInput.value) {
+            const start = startTimePicker.selectedDates[0];
+            const end = endTimePicker.selectedDates[0];
+            const duration = parseInt(durationInput.value);
+            
+            const diffMinutes = (end - start) / (1000 * 60);
+            
+            if (diffMinutes !== duration) {
+                durationError.style.display = 'block';
+                return false;
+            } else {
+                durationError.style.display = 'none';
+                return true;
+            }
+        }
+        return true;
+    }
+
+    // Form submission validation
+    document.getElementById('eventForm').addEventListener('submit', function(e) {
+        if (!validateDuration()) {
+            e.preventDefault();
+            return false;
+        }
+    });
+
+    // Duration change handler
+    durationInput.addEventListener('change', function() {
+        if (startTimeInput.value) {
+            const startDate = startTimePicker.selectedDates[0];
+            updateEndTime(startDate);
+        }
+        startTimeError.style.display = 'none';
+        endTimeError.style.display = 'none';
+    });
+
+    // Toggle additional fields
     function toggleFields() {
-        console.log('toggleFields called'); // Debug log
         const eventType = document.getElementById('event_type').value;
         const examFields = document.querySelectorAll('.exam-field');
         const isExamSchedule = eventType === 'Exam_schedule';
-
-        console.log('Event Type:', eventType, 'Is Exam Schedule:', isExamSchedule); // Debug log
 
         examFields.forEach(field => {
             field.style.display = isExamSchedule ? 'block' : 'none';
@@ -200,7 +315,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Function to handle select all functionality
+    // Select all functionality
     function setupSelectAll(selectAllId, selectId) {
         const selectAllCheckbox = document.getElementById(selectAllId);
         const selectElement = document.getElementById(selectId);
@@ -227,33 +342,31 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // Setup select all for each multi-select
+    // Reset form handler
+    function resetForm() {
+        const form = document.querySelector('form');
+        form.reset();
+        document.getElementById('visibility').value = 'Teachers';
+        toggleFields();
+        const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+        checkboxes.forEach(checkbox => checkbox.checked = false);
+        startTimePicker.clear();
+        endTimePicker.clear();
+        startTimeError.style.display = 'none';
+        endTimeError.style.display = 'none';
+        durationError.style.display = 'none';
+    }
+
+    // Setup event listeners
     setupSelectAll('selectAllDepts', 'departments');
     setupSelectAll('selectAllSems', 'semesters');
     setupSelectAll('selectAllCourses', 'courses');
     setupSelectAll('selectAllYears', 'years');
 
-    // Reset form handler
-    function resetForm() {
-        console.log('resetForm called'); // Debug log
-        const form = document.querySelector('form');
-        form.reset();
-        document.getElementById('visibility').value = 'Teachers';
-        toggleFields(); // Hide exam fields on reset
-        const checkboxes = document.querySelectorAll('input[type="checkbox"]');
-        checkboxes.forEach(checkbox => checkbox.checked = false);
-    }
-
-    // Add event listener for event_type change
-    const eventTypeSelect = document.getElementById('event_type');
-    if (eventTypeSelect) {
-        eventTypeSelect.addEventListener('change', toggleFields);
-        console.log('Event listener added to event_type'); // Debug log
-    } else {
-        console.error('event_type element not found'); // Debug log
-    }
-
-    // Initial call to set field visibility
+    document.getElementById('event_type').addEventListener('change', toggleFields);
+    
+    // Initialize everything
+    initializeTimePickers();
     toggleFields();
 });
 </script>

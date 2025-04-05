@@ -730,6 +730,13 @@ def event_create():
                 return render_template('pages/event_create.html', question_banks=question_banks)
         
         if request.method == 'POST':
+            start_time_str = request.form.get('start_time')
+            end_time_str = request.form.get('end_time')
+
+            # Combine event_date with start_time and end_time
+            start_time = datetime.combine(event_date, datetime.strptime(start_time_str, '%H:%M').time())
+            end_time = datetime.combine(event_date, datetime.strptime(end_time_str, '%H:%M').time())
+
             event = Event(
                 title=request.form['title'],
                 description=request.form['description'],
@@ -741,7 +748,9 @@ def event_create():
                 courses=','.join(request.form.getlist('courses[]')) if request.form.getlist('courses[]') else None,
                 created_by=user_id,
                 status='published',
-                event_date=event_date
+                event_date=event_date,
+                start_time=start_time,
+                end_time=end_time
             )
             db.session.add(event)
             db.session.flush()
@@ -1043,16 +1052,16 @@ def update_event_visibility(event_id):
         return jsonify({"error": str(e)}), 500
 
 
-@app.route('/attend_exam/<int:event_id>', methods=['GET','POST'])
+from flask import session
+
+@app.route('/attend_exam/<int:event_id>', methods=['GET', 'POST'])
 def attend_exam(event_id):
-    # Ensure student is logged in
     user_id = session.get('user_id')
 
     if not user_id or db.session.get(User, user_id).role != 'Student':
         flash('You must be a student to attend an exam.', 'danger')
         return redirect(url_for('login'))
 
-    # Fetch the event and exam
     event = Event.query.get_or_404(event_id)
     if event.event_type.lower() != 'exam_schedule' or event.visibility != 'all':
         flash('This event is not an exam or not available to students.', 'danger')
@@ -1066,7 +1075,32 @@ def attend_exam(event_id):
         flash('No questions available for this exam.', 'warning')
         return redirect(url_for('student_events'))
 
+    # # Check if exam has already been submitted
+    # existing_submission = StudentAnswer.query.filter_by(student_id=user_id, exam_id=exam.id).first()
+    # if existing_submission:
+    #     flash('You have already submitted this exam.', 'warning')
+    #     return redirect(url_for('student_events'))
+
+    # # Track exam start in session
+    # exam_key = f'exam_{event_id}_started'
+    # if request.method == 'GET' and exam_key in session:
+    #     flash('Exam in progress. Reloading is not allowed.', 'danger')
+    #     return redirect(url_for('student_events'))  # Block reload attempts
+
+    # if request.method == 'GET':
+    #     session[exam_key] = True  # Mark exam as started
+    #     session['exam_start_time'] = datetime.utcnow().isoformat()  # Track start time
+
     # if request.method == 'POST':
+    #     # Validate time limit server-side
+    #     start_time = datetime.fromisoformat(session.get('exam_start_time'))
+    #     elapsed_time = (datetime.utcnow() - start_time).total_seconds() / 60
+    #     if elapsed_time > exam.exam_duration:
+    #         flash('Time limit exceeded. Exam submission rejected.', 'danger')
+    #         session.pop(exam_key, None)  # Clear exam state
+    #         session.pop('exam_start_time', None)
+    #         return redirect(url_for('student_events'))
+
     #     answers = []
     #     for question in questions:
     #         answer = request.form.get(f'question_{question.id}')
@@ -1079,18 +1113,20 @@ def attend_exam(event_id):
     #             )
     #             answers.append(student_answer)
 
-    #     if answers:
-    #         db.session.bulk_save_objects(answers)
-    #         db.session.commit()
-    #     flash('Exam submitted successfully!', 'success')
-    #     return redirect(url_for('student_events'))
+        if answers:
+            db.session.bulk_save_objects(answers)
+            db.session.commit()
+            session.pop(exam_key, None)  # Clear exam state
+            session.pop('exam_start_time', None)
+            flash('Exam submitted successfully!', 'success')
+            return redirect(url_for('student_events'))
 
-    return render_template('pages/attend_exam.html', 
-                         event=event, 
-                         exam=exam, 
-                         question_bank=question_bank, 
-                         questions=questions)
-    
+    return render_template('pages/attend_exam.html',
+                           event=event,
+                           exam=exam,
+                           question_bank=question_bank,
+                           questions=questions,
+                           exam_duration=exam.exam_duration)
    
     
 

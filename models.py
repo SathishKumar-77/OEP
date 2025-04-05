@@ -86,6 +86,8 @@ class Event(db.Model):
     years = db.Column(db.JSON)
     departments = db.Column(db.JSON)
     event_date = db.Column(db.DateTime, nullable=False)
+    start_time = db.Column(db.DateTime, nullable=False)
+    end_time = db.Column(db.DateTime, nullable=False)
     semesters = db.Column(db.JSON)
     courses = db.Column(db.JSON)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
