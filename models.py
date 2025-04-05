@@ -1,4 +1,5 @@
 from flask_sqlalchemy import  SQLAlchemy
+from datetime import datetime
 
 db = SQLAlchemy()
 
@@ -12,7 +13,7 @@ class Admin(db.Model):
     gender = db.Column(db.String(20))
     email = db.Column(db.String(50), unique=True)
     emp_id = db.Column(db.String(20), unique=True)
-    password = db.Column(db.String(100))
+    # password = db.Column(db.String(100))
 
 class Teacher(db.Model):
     __tablename__ = 'Teacher_Details'
@@ -23,7 +24,7 @@ class Teacher(db.Model):
     emp_id = db.Column(db.String(20), unique=True)
     gender = db.Column(db.String(20))
     email = db.Column(db.String(50), unique=True)
-    password = db.Column(db.String(100))
+    # password = db.Column(db.String(100))
 
 class Student(db.Model):
     __tablename__ = 'Student_Details'
@@ -32,7 +33,7 @@ class Student(db.Model):
     name = db.Column(db.String(30), nullable= False)
     gender = db.Column(db.String(20))
     email = db.Column(db.String(50), unique=True)
-    password = db.Column(db.String(100))
+    # password = db.Column(db.String(100))
     reg_number = db.Column(db.String(40), nullable = False)
     dob = db.Column(db.String(50))
     department = db.Column(db.String(30), nullable = False)
@@ -68,6 +69,61 @@ class Questions(db.Model):
 
 
     question_bank_id = db.Column(db.Integer, db.ForeignKey('Question_Banks.id'), nullable=False)
+
+class User(db.Model):
+    __tablename__ = 'Users'
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(80), unique=True, nullable=False)
+    password = db.Column(db.String(120), nullable=False)
+    role = db.Column(db.String(20), nullable=False)
+
+
+class Event(db.Model):
+    __tablename__ = 'Events'
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(100), nullable=False)
+    description = db.Column(db.Text, nullable=False)
+    years = db.Column(db.JSON)
+    departments = db.Column(db.JSON)
+    event_date = db.Column(db.DateTime, nullable=False)
+    semesters = db.Column(db.JSON)
+    courses = db.Column(db.JSON)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    created_by = db.Column(db.Integer, db.ForeignKey('Users.id'))
+    event_type = db.Column(db.String(50))  # 'exam_schedule', 'timetable', etc.
+    visibility = db.Column(db.String(20))  # 'teachers_only', 'all'
+    status = db.Column(db.String(20))  # 'draft', 'published', 'modified'
+    
+class EventModification(db.Model):
+    __tablename__ = 'EventModifications'
+    id = db.Column(db.Integer, primary_key=True)
+    event_id = db.Column(db.Integer, db.ForeignKey('Events.id'))
+    modified_by = db.Column(db.Integer, db.ForeignKey('Users.id'))
+    modifications = db.Column(db.Text)
+    modified_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+
+class Notification(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('Users.id'), nullable=False)  # Correct table reference
+    title = db.Column(db.String(255), nullable=False)
+    event_date = db.Column(db.String(10), nullable=False)  # Store event date as 'YYYY-MM-DD'
+    type = db.Column(db.String(100), nullable=False)
+    read = db.Column(db.Boolean, default=False, nullable=False)  # Track whether the notification was read
+
+    def __init__(self, user_id, title, event_date, type):
+        self.user_id = user_id
+        self.title = title
+        self.event_date = event_date
+        self.type = type
+
+class Exam(db.Model):
+    __tablename__ = 'Exams'
+    id = db.Column(db.Integer, primary_key=True)
+    event_id = db.Column(db.Integer, db.ForeignKey('Events.id'), nullable=False)
+    question_bank_id = db.Column(db.Integer, db.ForeignKey('Question_Banks.id'), nullable=True)  # Optional for now
+    exam_duration = db.Column(db.Integer)  # Duration in minutes
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
 
     

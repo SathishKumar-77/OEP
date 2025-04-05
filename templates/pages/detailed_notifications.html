@@ -1,0 +1,47 @@
+{% extends 'layouts/main.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card shadow">
+        <div class="card-header bg-primary text-white">
+            <h3 class="mb-0">{{ event.title }}</h3>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-12">
+                    <h5 class="card-title mb-4">Event Details</h5>
+                    <div class="mb-3">
+                        <i class="bi bi-calendar3 me-2"></i>
+                        <strong>Date:</strong> {{ event.event_date.strftime('%Y-%m-%d') }}
+                    </div>
+                    <div class="mb-3">
+                        <i class="bi bi-tag me-2"></i>
+                        <strong>Type:</strong> {{ event.event_type }}
+                    </div>
+                    <div class="mb-3">
+                        <i class="bi bi-info-circle me-2"></i>
+                        <strong>Description:</strong>
+                        <p class="mt-2">{{ event.description }}</p>
+                    </div>
+                    {% if event.departments %}
+                    <div class="mb-3">
+                        <i class="bi bi-building me-2"></i>
+                        <strong>Departments:</strong> {{ event.departments|join(', ') }}
+                    </div>
+                    {% endif %}
+                    {% if event.courses %}
+                    <div class="mb-3">
+                        <i class="bi bi-book me-2"></i>
+                        <strong>Courses:</strong> {{ event.courses|join(', ') }}
+                    </div>
+                    {% endif %}
+                    <div class="mb-3">
+                        <i class="bi bi-check-circle me-2"></i>
+                        <strong>Status:</strong> <span class="badge bg-success">{{ event.status }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 
