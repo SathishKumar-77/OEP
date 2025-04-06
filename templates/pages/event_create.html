@@ -1,0 +1,373 @@
+{% extends 'layouts/main.html' %}
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-body">
+                <h3 class="card-title mb-4">Create New Event</h3>
+                <form method="POST" id="eventForm">
+                    <div class="row">
+                        <!-- Left Column -->
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="title" class="form-label">Event Title</label>
+                                <input type="text" class="form-control" id="title" name="title" required>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="description" class="form-label">Description</label>
+                                <textarea class="form-control" id="description" name="description" rows="4" required></textarea>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="event_type" class="form-label">Event Type</label>
+                                <select class="form-select" id="event_type" name="event_type" required>
+                                    <option value="">Select Event Type</option>
+                                    <option value="Exam_schedule">Exam Schedule</option>
+                                    <option value="Timetable">Timetable</option>
+                                    <option value="GN-Announcement">General Announcement</option>
+                                    <option value="Assignment">Assignment</option>
+                                    <option value="Results">Results</option>
+                                </select>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="visibility" class="form-label">Visibility</label>
+                                <select class="form-select" id="visibility" name="visibility" required>
+                                    <option value="Teachers" selected>Teachers only</option>
+                                    <option value="all">Teachers and Students</option>
+                                </select>
+                            </div>
+
+                            <!-- Hidden Fields -->
+                            <div class="mb-3 exam-field" style="display: none;">
+                                <label class="form-label">Years</label>
+                                <div class="mb-2">
+                                    <input type="checkbox" id="selectAllYears" class="form-check-input me-2">
+                                    <label for="selectAllYears" class="form-check-label">Select All Years</label>
+                                </div>
+                                <select class="form-select" id="years" name="years[]" multiple>
+                                    <option value="1">First Year</option>
+                                    <option value="2">Second Year</option>
+                                    <option value="3">Third Year</option>
+                                    <option value="4">Fourth Year</option>
+                                </select>
+                                <small class="form-text text-muted">Hold Ctrl/Cmd to select multiple years</small>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="exam_duration" class="form-label">Duration (minutes)</label>
+                                <input type="number" class="form-control" id="exam_duration" name="exam_duration" min="1" placeholder="e.g., 60">
+                            </div>
+                            <div class="mb-3">
+                                <label for="start_time" class="form-label">Start Time</label>
+                                <input type="text" class="form-control" id="start_time" name="start_time" placeholder="Select start time" readonly>
+                                <div id="startTimeError" class="text-danger" style="display: none;">Please select duration first</div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="end_time" class="form-label">End Time</label>
+                                <input type="text" class="form-control" id="end_time" name="end_time" placeholder="Select end time" readonly>
+                                <div id="endTimeError" class="text-danger" style="display: none;">Please select start time and duration first</div>
+                                <div id="durationError" class="text-danger" style="display: none;">End time doesn't match duration</div>
+                            </div>
+                        </div>
+                        
+                        <!-- Right Column -->
+                        <div class="col-md-6">
+                            <div class="mb-3 exam-field" style="display: none;">
+                                <label class="form-label">Departments</label>
+                                <div class="mb-2">
+                                    <input type="checkbox" id="selectAllDepts" class="form-check-input me-2">
+                                    <label for="selectAllDepts" class="form-check-label">Select All Departments</label>
+                                </div>
+                                <select class="form-select" id="departments" name="departments[]" multiple>
+                                    <option value="CS">Computer Science</option>
+                                    <option value="IT">Information Technology</option>
+                                    <option value="ECE">Electronics & Communication</option>
+                                    <option value="EEE">Electrical & Electronics</option>
+                                    <option value="MECH">Mechanical Engineering</option>
+                                    <option value="CIVIL">Civil Engineering</option>
+                                </select>
+                            </div>
+                            
+                            <div class="mb-3 exam-field" style="display: none;">
+                                <label class="form-label">Semesters</label>
+                                <div class="mb-2">
+                                    <input type="checkbox" id="selectAllSems" class="form-check-input me-2">
+                                    <label for="selectAllSems" class="form-check-label">Select All Semesters</label>
+                                </div>
+                                <select class="form-select" id="semesters" name="semesters[]" multiple>
+                                    <option value="1">Semester 1</option>
+                                    <option value="2">Semester 2</option>
+                                    <option value="3">Semester 3</option>
+                                    <option value="4">Semester 4</option>
+                                    <option value="5">Semester 5</option>
+                                    <option value="6">Semester 6</option>
+                                    <option value="7">Semester 7</option>
+                                    <option value="8">Semester 8</option>
+                                </select>
+                            </div>
+                            
+                            <div class="mb-3 exam-field" style="display: none;">
+                                <label class="form-label">Courses</label>
+                                <div class="mb-2">
+                                    <input type="checkbox" id="selectAllCourses" class="form-check-input me-2">
+                                    <label for="selectAllCourses" class="form-check-label">Select All Courses</label>
+                                </div>
+                                <select class="form-select" id="courses" name="courses[]" multiple>
+                                    <option value="PYTHON">Python Programming</option>
+                                    <option value="JAVA">Java Programming</option>
+                                    <option value="DBMS">Database Management Systems</option>
+                                    <option value="DS">Data Structures</option>
+                                    <option value="OS">Operating Systems</option>
+                                    <option value="CN">Computer Networks</option>
+                                    <option value="WEB">Web Technologies</option>
+                                    <option value="AI">Artificial Intelligence</option>
+                                </select>
+                            </div>
+
+                            <div class="mb-3 exam-field" style="display: none;">
+                                <label for="question_bank_id" class="form-label">Question Bank</label>
+                                <select class="form-select" id="question_bank_id" name="question_bank_id">
+                                    <option value="">Select a Question Bank</option>
+                                    {% for qb in question_banks %}
+                                    <option value="{{ qb.id }}">{{ qb.name }} ({{ qb.difficulty }})</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row mt-4">
+                        <div class="col-12">
+                            <button type="submit" class="btn btn-primary">Create Event</button>
+                            <button type="reset" class="btn btn-secondary ms-2" onclick="resetForm()">Reset Form</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Flatpickr CSS and JS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
+<style>
+select[multiple] {
+    height: 120px !important;
+}
+
+.form-select option {
+    padding: 8px;
+}
+
+.form-select option:checked {
+    background-color: #0d6efd;
+    color: white;
+}
+
+.card {
+    box-shadow: 0 0 15px rgba(0,0,0,0.1);
+}
+
+.form-label {
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+}
+
+.form-text {
+    margin-top: 0.25rem;
+    font-size: 0.875em;
+}
+
+.text-danger {
+    font-size: 0.875em;
+    margin-top: 0.25rem;
+}
+
+@media (max-width: 768px) {
+    select[multiple] {
+        height: 100px !important;
+    }
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('Event Create Script Loaded');
+
+    // Initialize Flatpickr
+    let startTimePicker, endTimePicker;
+    
+    const durationInput = document.getElementById('exam_duration');
+    const startTimeInput = document.getElementById('start_time');
+    const endTimeInput = document.getElementById('end_time');
+    const startTimeError = document.getElementById('startTimeError');
+    const endTimeError = document.getElementById('endTimeError');
+    const durationError = document.getElementById('durationError');
+
+    // Function to initialize time pickers with validation
+    function initializeTimePickers() {
+        startTimePicker = flatpickr('#start_time', {
+            enableTime: true,
+            noCalendar: true,
+            dateFormat: "H:i",
+            time_24hr: true,
+            onOpen: function() {
+                if (!durationInput.value) {
+                    startTimeError.style.display = 'block';
+                    startTimePicker.close();
+                    return false;
+                }
+                startTimeError.style.display = 'none';
+            },
+            onChange: function(selectedDates) {
+                if (durationInput.value && selectedDates[0]) {
+                    updateEndTime(selectedDates[0]);
+                }
+            }
+        });
+
+        endTimePicker = flatpickr('#end_time', {
+            enableTime: true,
+            noCalendar: true,
+            dateFormat: "H:i",
+            time_24hr: true,
+            onOpen: function() {
+                if (!durationInput.value || !startTimeInput.value) {
+                    endTimeError.style.display = 'block';
+                    endTimePicker.close();
+                    return false;
+                }
+                endTimeError.style.display = 'none';
+            },
+            onChange: validateDuration
+        });
+    }
+
+    // Function to update end time based on start time and duration
+    function updateEndTime(startDate) {
+        const duration = parseInt(durationInput.value);
+        if (duration && startDate) {
+            const endDate = new Date(startDate);
+            endDate.setMinutes(endDate.getMinutes() + duration);
+            endTimePicker.setDate(endDate);
+            validateDuration();
+        }
+    }
+
+    // Function to validate duration matches time difference
+    function validateDuration() {
+        if (startTimeInput.value && endTimeInput.value && durationInput.value) {
+            const start = startTimePicker.selectedDates[0];
+            const end = endTimePicker.selectedDates[0];
+            const duration = parseInt(durationInput.value);
+            
+            const diffMinutes = (end - start) / (1000 * 60);
+            
+            if (diffMinutes !== duration) {
+                durationError.style.display = 'block';
+                return false;
+            } else {
+                durationError.style.display = 'none';
+                return true;
+            }
+        }
+        return true;
+    }
+
+    // Form submission validation
+    document.getElementById('eventForm').addEventListener('submit', function(e) {
+        if (!validateDuration()) {
+            e.preventDefault();
+            return false;
+        }
+    });
+
+    // Duration change handler
+    durationInput.addEventListener('change', function() {
+        if (startTimeInput.value) {
+            const startDate = startTimePicker.selectedDates[0];
+            updateEndTime(startDate);
+        }
+        startTimeError.style.display = 'none';
+        endTimeError.style.display = 'none';
+    });
+
+    // Toggle additional fields
+    function toggleFields() {
+        const eventType = document.getElementById('event_type').value;
+        const examFields = document.querySelectorAll('.exam-field');
+        const isExamSchedule = eventType === 'Exam_schedule';
+
+        examFields.forEach(field => {
+            field.style.display = isExamSchedule ? 'block' : 'none';
+            const inputs = field.querySelectorAll('select, input:not([type="checkbox"])');
+            inputs.forEach(input => {
+                if (isExamSchedule) {
+                    input.setAttribute('required', 'required');
+                } else {
+                    input.removeAttribute('required');
+                }
+            });
+        });
+    }
+
+    // Select all functionality
+    function setupSelectAll(selectAllId, selectId) {
+        const selectAllCheckbox = document.getElementById(selectAllId);
+        const selectElement = document.getElementById(selectId);
+        
+        if (selectAllCheckbox && selectElement) {
+            selectAllCheckbox.addEventListener('change', function() {
+                const options = selectElement.options;
+                for (let i = 0; i < options.length; i++) {
+                    options[i].selected = selectAllCheckbox.checked;
+                }
+            });
+
+            selectElement.addEventListener('change', function() {
+                const options = selectElement.options;
+                let allSelected = true;
+                for (let i = 0; i < options.length; i++) {
+                    if (!options[i].selected) {
+                        allSelected = false;
+                        break;
+                    }
+                }
+                selectAllCheckbox.checked = allSelected;
+            });
+        }
+    }
+
+    // Reset form handler
+    function resetForm() {
+        const form = document.querySelector('form');
+        form.reset();
+        document.getElementById('visibility').value = 'Teachers';
+        toggleFields();
+        const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+        checkboxes.forEach(checkbox => checkbox.checked = false);
+        startTimePicker.clear();
+        endTimePicker.clear();
+        startTimeError.style.display = 'none';
+        endTimeError.style.display = 'none';
+        durationError.style.display = 'none';
+    }
+
+    // Setup event listeners
+    setupSelectAll('selectAllDepts', 'departments');
+    setupSelectAll('selectAllSems', 'semesters');
+    setupSelectAll('selectAllCourses', 'courses');
+    setupSelectAll('selectAllYears', 'years');
+
+    document.getElementById('event_type').addEventListener('change', toggleFields);
+    
+    // Initialize everything
+    initializeTimePickers();
+    toggleFields();
+});
+</script>
+{% endblock %}

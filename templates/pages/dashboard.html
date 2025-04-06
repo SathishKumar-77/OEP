@@ -1,0 +1,413 @@
+{% extends 'layouts/main.html' %}
+{% block content %}
+<div class="container mt-5">
+    <h1 class="mb-4 text-center fw-bold text-dark">Dashboard - {{ role }}</h1>
+
+    <!-- Dashboard Cards -->
+    <div class="row row-cols-1 row-cols-md-3 g-4 mb-5">
+        {% if role == 'Admin' %}
+        <div class="col">
+            <div class="card h-100 shadow-lg border-0 hover-card gradient-card">
+                <div class="card-body p-4">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-shrink-0 me-3">
+                            <div class="icon-circle bg-primary bg-gradient">
+                                <i class="bi bi-people text-white" style="font-size: 2rem;"></i>
+                            </div>
+                        </div>
+                        <div class="flex-grow-1">
+                            <h6 class="text-muted mb-1">Total Teachers</h6>
+                            <h3 class="fw-bold text-primary mb-0">{{ teacher_count }}</h3>
+                        </div>
+                    </div>
+                    <div class="progress mt-3 bg-light" style="height: 8px;">
+                        <div class="progress-bar bg-primary bg-gradient" style="width: {{ (teacher_count/10)|int }}%;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card h-100 shadow-lg border-0 hover-card gradient-card">
+                <div class="card-body p-4">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-shrink-0 me-3">
+                            <div class="icon-circle bg-success bg-gradient">
+                                <i class="bi bi-person-lines-fill text-white" style="font-size: 2rem;"></i>
+                            </div>
+                        </div>
+                        <div class="flex-grow-1">
+                            <h6 class="text-muted mb-1">Total Students</h6>
+                            <h3 class="fw-bold text-success mb-0">{{ student_count }}</h3>
+                        </div>
+                    </div>
+                    <div class="progress mt-3 bg-light" style="height: 8px;">
+                        <div class="progress-bar bg-success bg-gradient" style="width: {{ (student_count/20)|int }}%;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card h-100 shadow-lg border-0 hover-card gradient-card">
+                <div class="card-body p-4">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-shrink-0 me-3">
+                            <div class="icon-circle bg-warning bg-gradient">
+                                <i class="bi bi-calendar-event text-white" style="font-size: 2rem;"></i>
+                            </div>
+                        </div>
+                        <div class="flex-grow-1">
+                            <h6 class="text-muted mb-1">Total Events</h6>
+                            <h3 class="fw-bold text-warning mb-0">{{ event_count }}</h3>
+                        </div>
+                    </div>
+                    <div class="progress mt-3 bg-light" style="height: 8px;">
+                        <div class="progress-bar bg-warning bg-gradient" style="width: {{ (event_count/5)|int }}%;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% elif role == 'Teacher' %}
+        <div class="col">
+            <div class="card h-100 shadow-lg border-0 hover-card gradient-card">
+                <div class="card-body p-4">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-shrink-0 me-3">
+                            <div class="icon-circle bg-success bg-gradient">
+                                <i class="bi bi-person-lines-fill text-white" style="font-size: 2rem;"></i>
+                            </div>
+                        </div>
+                        <div class="flex-grow-1">
+                            <h6 class="text-muted mb-1">Total Students</h6>
+                            <h3 class="fw-bold text-success mb-0">{{ student_count }}</h3>
+                        </div>
+                    </div>
+                    <div class="progress mt-3 bg-light" style="height: 8px;">
+                        <div class="progress-bar bg-success bg-gradient" style="width: {{ (student_count/20)|int }}%;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card h-100 shadow-lg border-0 hover-card gradient-card">
+                <div class="card-body p-4">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-shrink-0 me-3">
+                            <div class="icon-circle bg-warning bg-gradient">
+                                <i class="bi bi-calendar-event text-white" style="font-size: 2rem;"></i>
+                            </div>
+                        </div>
+                        <div class="flex-grow-1">
+                            <h6 class="text-muted mb-1">Total Events</h6>
+                            <h3 class="fw-bold text-warning mb-0">{{ event_count }}</h3>
+                        </div>
+                    </div>
+                    <div class="progress mt-3 bg-light" style="height: 8px;">
+                        <div class="progress-bar bg-warning bg-gradient" style="width: {{ (event_count/5)|int }}%;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card h-100 shadow-lg border-0 hover-card gradient-card">
+                <div class="card-body p-4">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-shrink-0 me-3">
+                            <div class="icon-circle bg-info bg-gradient">
+                                <i class="bi bi-clipboard-check text-white" style="font-size: 2rem;"></i>
+                            </div>
+                        </div>
+                        <div class="flex-grow-1">
+                            <h6 class="text-muted mb-1">Total Exams</h6>
+                            <h3 class="fw-bold text-info mb-0">{{ exam_count }}</h3>
+                        </div>
+                    </div>
+                    <div class="progress mt-3 bg-light" style="height: 8px;">
+                        <div class="progress-bar bg-info bg-gradient" style="width: {{ (exam_count/10)|int }}%;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% elif role == 'Student' %}
+        <div class="col">
+            <div class="card h-100 shadow-lg border-0 hover-card gradient-card">
+                <div class="card-body p-4">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-shrink-0 me-3">
+                            <div class="icon-circle bg-warning bg-gradient">
+                                <i class="bi bi-calendar-event text-white" style="font-size: 2rem;"></i>
+                            </div>
+                        </div>
+                        <div class="flex-grow-1">
+                            <h6 class="text-muted mb-1">Total Events</h6>
+                            <h3 class="fw-bold text-warning mb-0">{{ event_count }}</h3>
+                        </div>
+                    </div>
+                    <div class="progress mt-3 bg-light" style="height: 8px;">
+                        <div class="progress-bar bg-warning bg-gradient" style="width: {{ (event_count/5)|int }}%;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card h-100 shadow-lg border-0 hover-card gradient-card">
+                <div class="card-body p-4">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-shrink-0 me-3">
+                            <div class="icon-circle bg-info bg-gradient">
+                                <i class="bi bi-clipboard-check text-white" style="font-size: 2rem;"></i>
+                            </div>
+                        </div>
+                        <div class="flex-grow-1">
+                            <h6 class="text-muted mb-1">Total Exams</h6>
+                            <h3 class="fw-bold text-info mb-0">{{ exam_count }}</h3>
+                        </div>
+                    </div>
+                    <div class="progress mt-3 bg-light" style="height: 8px;">
+                        <div class="progress-bar bg-info bg-gradient" style="width: {{ (exam_count/10)|int }}%;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card h-100 shadow-lg border-0 hover-card gradient-card">
+                <div class="card-body p-4">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-shrink-0 me-3">
+                            <div class="icon-circle bg-primary bg-gradient">
+                                <i class="bi bi-person-check text-white" style="font-size: 2rem;"></i>
+                            </div>
+                        </div>
+                        <div class="flex-grow-1">
+                            <h6 class="text-muted mb-1">Logged In Students</h6>
+                            <h3 class="fw-bold text-primary mb-0">{{ logged_in_count }}</h3>
+                        </div>
+                    </div>
+                    <div class="progress mt-3 bg-light" style="height: 8px;">
+                        <div class="progress-bar bg-primary bg-gradient" style="width: {{ (logged_in_count/15)|int }}%;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Chart and Events -->
+    <div class="row g-4">
+        <div class="col-lg-8">
+            <div class="card shadow-lg border-0 gradient-card">
+                <div class="card-header bg-white py-3">
+                    <h5 class="mb-0 fw-semibold">{{ chart_data.title|default('Statistics') }}</h5>
+                </div>
+                <div class="card-body p-4">
+                    {% if chart_data.labels|length > 0 %}
+                    <div style="height: 400px;">
+                        <canvas id="statsChart"></canvas>
+                    </div>
+                    {% else %}
+                    <div class="text-center py-5">
+                        <i class="bi bi-bar-chart-line text-muted" style="font-size: 3rem;"></i>
+                        <p class="text-muted mt-3">No data available for statistics</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="card shadow-lg border-0 h-100 gradient-card">
+                <div class="card-header bg-white py-3">
+                    <h5 class="mb-0 fw-semibold">Upcoming Events</h5>
+                </div>
+                <div class="card-body p-0">
+                    <ul class="list-group list-group-flush">
+                        {% for event in upcoming_events %}
+                        <li class="list-group-item py-3 hover-event">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <div class="fw-medium">{{ event.title }}</div>
+                                    <small class="text-muted">{{ event.event_date.strftime('%b %d, %Y') }}</small>
+                                </div>
+                                <span class="badge bg-primary-subtle text-primary rounded-pill">{{ event.event_type }}</span>
+                            </div>
+                        </li>
+                        {% else %}
+                        <li class="list-group-item py-3 text-muted">No upcoming events</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const chartData = {{ chart_data|tojson|safe }};
+        if (chartData.labels && chartData.labels.length > 0) {
+            const ctx = document.getElementById('statsChart').getContext('2d');
+            
+            console.log('Chart Data:', chartData);
+
+            // Create gradient colors for charts
+            const createGradient = (ctx, colorStart, colorEnd) => {
+                const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+                gradient.addColorStop(0, colorStart);
+                gradient.addColorStop(1, colorEnd);
+                return gradient;
+            };
+
+            const color1Gradient = createGradient(ctx, 'rgba(13, 110, 253, 0.8)', 'rgba(13, 110, 253, 0.2)');
+            const color2Gradient = createGradient(ctx, 'rgba(25, 135, 84, 0.8)', 'rgba(25, 135, 84, 0.2)');
+            
+            let datasets = [];
+            
+            // Add first dataset if available
+            if (chartData.values1 && chartData.values1.length > 0) {
+                datasets.push({
+                    label: chartData.label1 || 'Data 1',
+                    data: chartData.values1,
+                    backgroundColor: color1Gradient,
+                    borderColor: 'rgba(13, 110, 253, 1)',
+                    borderWidth: 2,
+                    borderRadius: 6,
+                });
+            }
+            
+            // Add second dataset if available
+            if (chartData.values2 && chartData.values2.length > 0) {
+                datasets.push({
+                    label: chartData.label2 || 'Data 2',
+                    data: chartData.values2,
+                    backgroundColor: color2Gradient,
+                    borderColor: 'rgba(25, 135, 84, 1)',
+                    borderWidth: 2,
+                    borderRadius: 6,
+                });
+            }
+
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: chartData.labels,
+                    datasets: datasets
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                            labels: {
+                                font: { size: 14, weight: 'bold' },
+                                padding: 20,
+                                boxWidth: 50,
+                                usePointStyle: true
+                            }
+                        },
+                        tooltip: {
+                            mode: 'index',
+                            intersect: false,
+                            backgroundColor: 'rgba(0,0,0,0.8)',
+                            padding: 10,
+                            cornerRadius: 8
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: { 
+                                color: 'rgba(0,0,0,0.05)',
+                                lineWidth: 1
+                            },
+                            title: { 
+                                display: true, 
+                                text: 'Count',
+                                font: { size: 14, weight: 'bold' }
+                            },
+                            ticks: {
+                                padding: 10
+                            }
+                        },
+                        x: {
+                            grid: { display: false },
+                            title: { 
+                                display: true, 
+                                text: chartData.xAxisLabel || 'Categories',
+                                font: { size: 14, weight: 'bold' }
+                            },
+                            ticks: {
+                                padding: 10
+                            }
+                        }
+                    },
+                    animation: {
+                        duration: 1500,
+                        easing: 'easeOutQuart'
+                    },
+                    elements: {
+                        bar: {
+                            borderRadius: 8,
+                            borderWidth: 2
+                        }
+                    }
+                }
+            });
+        }
+    });
+</script>
+
+<style>
+    .hover-card {
+        transition: all 0.3s ease;
+        background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+    }
+    .hover-card:hover {
+        transform: translateY(-8px) scale(1.02);
+        box-shadow: 0 15px 30px rgba(0,0,0,0.15) !important;
+    }
+    .gradient-card {
+        background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+    }
+    .icon-circle {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        transition: all 0.3s ease;
+    }
+    .card {
+        border-radius: 15px;
+        overflow: hidden;
+        transition: all 0.3s ease;
+    }
+    .list-group-item {
+        border: none;
+        border-bottom: 1px solid rgba(0,0,0,0.05);
+        transition: all 0.3s ease;
+    }
+    .hover-event:hover {
+        background-color: #f8f9fa;
+        padding-left: 10px;
+    }
+    .list-group-item:last-child {
+        border-bottom: none;
+    }
+    .bg-primary-subtle {
+        background-color: rgba(13, 110, 253, 0.1);
+        transition: all 0.3s ease;
+    }
+    .bg-primary-subtle:hover {
+        background-color: rgba(13, 110, 253, 0.2);
+    }
+    .progress {
+        border-radius: 10px;
+        overflow: hidden;
+    }
+    .progress-bar {
+        transition: width 0.6s ease;
+    }
+</style>
+{% endblock %}

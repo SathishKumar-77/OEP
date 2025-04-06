@@ -1,0 +1,163 @@
+{% extends 'layouts/main.html' %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title">Events Management</h4>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover" id="eventsTable">
+                            <thead>
+                                <tr>
+                                    <th>Title</th>
+                                    <th>Date</th>
+                                    <th>Type</th>
+                                    <th>Departments</th>
+                                    <th>Courses</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for event in events %}
+                                <tr>
+                                    <td>{{ event.title }}</td>
+                                    <td>{{ event.event_date.strftime('%Y-%m-%d') }}</td>
+                                    <td>
+                                        <span class="badge bg-{{ 'danger' if event.event_type == 'exam_schedule' 
+                                            else 'primary' if event.event_type == 'timetable'
+                                            else 'success' if event.event_type == 'announcement'
+                                            else 'warning' if event.event_type == 'assignment'
+                                            else 'info' }}">
+                                            {{ event.event_type }}
+                                        </span>
+                                    </td>
+                                    <td>{{ event.departments|join(', ') if event.departments else 'All' }}</td>
+                                    <td>{{ event.courses|join(', ') if event.courses else 'All' }}</td>
+                                    <td>
+                                        <span class="badge bg-{{ 'success' if event.status == 'published' 
+                                            else 'warning' if event.status == 'draft'
+                                            else 'info' }}">
+                                            {{ event.status }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <button class="btn btn-sm btn-info" onclick="viewEventDetails({{ event.id }})" title="View Event Details">
+                                            <i class="bi bi-eye"></i>
+                                        </button>
+                                        {% if event.event_type.lower() == 'exam_schedule' or event.event_type.lower() == 'exam schedule' %}
+                                        <button class="btn btn-sm visibility-toggle {{ 'btn-success' if event.visibility == 'all' else 'btn-warning' }}" 
+                                                data-event-id="{{ event.id }}"
+                                                data-visibility="{{ event.visibility }}"
+                                                title="{{ 'Hide from Students' if event.visibility == 'all' else 'Show to Students' }}">
+                                            <i class="bi {{ 'bi-eye-slash' if event.visibility == 'all' else 'bi-eye' }}"></i>
+                                        </button>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Event Details Modal -->
+<div class="modal fade" id="eventDetailsModal" tabindex="-1" aria-labelledby="eventDetailsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="eventDetailsModalLabel">Event Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="eventDetailsContent">
+                    <!-- Content will be loaded dynamically -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    console.log('Teacher Events Script: Loaded');
+
+    $(document).ready(function() {
+        console.log('Teacher Events Script: Document ready');
+        $('#eventsTable').DataTable({
+            "order": [[1, "desc"]],
+            "pageLength": 10
+        });
+        console.log('Teacher Events Script: DataTable initialized');
+
+        $(document).on('click', '.visibility-toggle', function() {
+            console.log('Teacher Events Script: Visibility toggle clicked');
+            const eventId = $(this).data('event-id');
+            const currentVisibility = $(this).data('visibility');
+            console.log('Event ID:', eventId, 'Current visibility:', currentVisibility);
+
+            const newVisibility = currentVisibility === 'all' ? 'Teachers' : 'all';
+            fetch(`/event_visibility/${eventId}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ visibility: newVisibility })
+            })
+            .then(response => {
+                console.log('Fetch status:', response.status);
+                if (!response.ok) throw new Error('Fetch failed');
+                return response.json();
+            })
+            .then(data => {
+                console.log('Response data:', data);
+                if (data.success) {
+                    $(this).removeClass('btn-success btn-warning')
+                           .addClass(newVisibility === 'all' ? 'btn-success' : 'btn-warning');
+                    $(this).data('visibility', newVisibility);
+                    $(this).attr('title', newVisibility === 'all' ? 'Hide from Students' : 'Show to Students');
+                    $(this).find('i').removeClass('bi-eye bi-eye-slash')
+                                    .addClass(newVisibility === 'all' ? 'bi-eye-slash' : 'bi-eye');
+                    toastr.success(data.message);
+                } else {
+                    toastr.error(data.error || 'Failed to update visibility');
+                }
+            })
+            .catch(error => {
+                console.error('Fetch error:', error);
+                toastr.error('Failed to update visibility');
+            });
+        });
+    });
+
+    function viewEventDetails(eventId) {
+        console.log('Viewing event details for ID:', eventId);
+        fetch(`/api/event_details?id=${eventId}`)
+            .then(response => response.json())
+            .then(data => {
+                const content = document.getElementById('eventDetailsContent');
+                content.innerHTML = `
+                    <div class="mb-3"><h6>Title</h6><p>${data.title}</p></div>
+                    <div class="mb-3"><h6>Date</h6><p>${data.event_date}</p></div>
+                    <div class="mb-3"><h6>Type</h6><p>${data.event_type}</p></div>
+                    <div class="mb-3"><h6>Description</h6><p>${data.description || 'No description'}</p></div>
+                    <div class="mb-3"><h6>Departments</h6><p>${data.departments ? data.departments.join(', ') : 'All'}</p></div>
+                    <div class="mb-3"><h6>Courses</h6><p>${data.courses ? data.courses.join(', ') : 'All'}</p></div>
+                    <div class="mb-3"><h6>Status</h6><span class="badge bg-${data.status === 'published' ? 'success' : 'warning'}">${data.status}</span></div>
+                `;
+                new bootstrap.Modal(document.getElementById('eventDetailsModal')).show();
+            })
+            .catch(error => {
+                console.error('Error fetching event details:', error);
+                toastr.error('Failed to load event details');
+            });
+    }
+</script>
+{% endblock %}

@@ -1,0 +1,105 @@
+{% extends 'layouts/main.html' %}
+{% block content %}
+<div class="container-fluid mt-4">
+    <!-- Breadcrumb and Navigation -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{{ url_for('admin_dashboard') }}">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="{{ url_for('question_bank') }}">Question Bank</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">View Question</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    <!-- Question Bank Details Section -->
+    <div class="row">
+        <div class="col">
+            <div class="card">
+                <div class="card-body">
+                    <div id="question-bank-details" class="mb-4">
+                        <!-- Question bank details will be rendered here -->
+                    </div>
+
+                    <div id="questions-list" class="question-paper">
+                        <!-- Questions will be dynamically loaded here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- JavaScript -->
+<script>
+    // Function to fetch and display question bank details and questions
+    async function fetchQuestionBankDetails() {
+        // Get the `id` parameter from the URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const questionBankId = urlParams.get('id');
+
+        if (!questionBankId) {
+            document.getElementById('question-bank-details').innerHTML = `
+                <p class="text-danger">Invalid Question Bank ID</p>`;
+            return;
+        }
+
+        try {
+            // Fetch the question bank data from the API
+            const response = await fetch(`/view_question_bank/${questionBankId}`);
+            if (!response.ok) {
+                throw new Error('Failed to fetch question bank data.');
+            }
+            const data = await response.json();
+
+            // Render the question bank details
+            const questionBankDetails = document.getElementById('question-bank-details');
+            questionBankDetails.innerHTML = `
+                <h3>${data.question_bank.name}</h3>
+                <p class="text-muted">Difficulty: ${data.question_bank.difficulty} | Total Questions: ${data.question_bank.total_questions}</p>
+            `;
+
+            // Render the questions
+            const questionsList = document.getElementById('questions-list');
+            if (data.questions && data.questions.length > 0) {
+                questionsList.innerHTML = data.questions.map((question, index) => `
+                    <div class="question mb-4">
+                        <h5>${index + 1}. ${question.question}</h5>
+                        <ul class="list-unstyled options">
+                            <li>A. ${question.option1}</li>
+                            <li>B. ${question.option2}</li>
+                            <li>C. ${question.option3}</li>
+                            <li>D. ${question.option4}</li>
+                        </ul>
+                        <button class="btn btn-sm btn-info" onclick="toggleAnswer('answer${index}')">Show Answer</button>
+                        <p id="answer${index}" class="mt-2 text-success" style="display: none;">
+                            Correct Answer: ${question.correct_answer}
+                        </p>
+                    </div>
+                `).join('');
+            } else {
+                questionsList.innerHTML = `<p class="text-muted">No questions available for this question bank.</p>`;
+            }
+        } catch (error) {
+            // Display error message
+            document.getElementById('question-bank-details').innerHTML = `
+                <p class="text-danger">Error: ${error.message}</p>`;
+        }
+    }
+
+    // Function to toggle the visibility of the correct answer
+    function toggleAnswer(answerId) {
+        const answerElement = document.getElementById(answerId);
+        answerElement.style.display = (answerElement.style.display === 'none' || answerElement.style.display === '') 
+            ? 'block' 
+            : 'none';
+    }
+
+    // Trigger data fetching when the page loads
+    document.addEventListener('DOMContentLoaded', fetchQuestionBankDetails);
+</script>
+<script src="{{ url_for('static', filename='js/script.js') }}"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+{% endblock %}

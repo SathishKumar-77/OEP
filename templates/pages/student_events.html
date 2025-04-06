@@ -1,0 +1,103 @@
+{% extends 'layouts/main.html' %}
+
+{% block content %}
+    <div class="container-fluid py-4">
+        <h2 class="mb-4">Upcoming Events</h2>
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+            {% for event in events %}
+            {% if event.visibility == 'all' %}
+            <div class="col">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-header bg-{{ 'danger' if event.event_type == 'exam_schedule' 
+                        else 'primary' if event.event_type == 'timetable'
+                        else 'success' if event.event_type == 'announcement'
+                        else 'warning' if event.event_type == 'assignment'
+                        else 'info' }} text-white">
+                        <h5 class="card-title mb-0">{{ event.title }}</h5>
+                    </div>
+                    <div class="card-body">
+                        <p class="card-text"><strong>Date:</strong> {{ event.event_date.strftime('%Y-%m-%d') }}</p>
+                        <p class="card-text"><strong>Type:</strong> {{ event.event_type }}</p>
+                        <p class="card-text"><strong>Departments:</strong> {{ event.departments|join(', ') if event.departments else 'All' }}</p>
+                        <p class="card-text"><strong>Courses:</strong> {{ event.courses|join(', ') if event.courses else 'All' }}</p>
+                        <!-- <p class="card-text"><strong>Status:</strong> 
+                            <span class="badge bg-{{ 'success' if event.status == 'published' 
+                                else 'warning' if event.status == 'draft'
+                                else 'info' }}">{{ event.status }}</span>
+                        </p> -->
+                        {% if event.description %}
+                        <p class="card-text"><strong>Description:</strong> {{ event.description }}</p>
+                        {% endif %}
+                    </div>
+                    <div class="card-footer bg-light">
+                        <button class="btn btn-sm btn-info" onclick="viewEventDetails({{ event.id }})">
+                            <i class="bi bi-eye"></i> View Details
+                        </button>
+                        {% if event.event_type.lower() == 'exam_schedule' %}
+
+                        <a href="{{ url_for('attend_exam', event_id=event.id) }}" class="btn btn-sm btn-primary ms-2">
+                            <i class="bi bi-pencil-square"></i> Attend the Exam
+                        </a>
+
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Event Details Modal (unchanged) -->
+    <div class="modal fade" id="eventDetailsModal" tabindex="-1" aria-labelledby="eventDetailsModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="eventDetailsModalLabel">Event Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="eventDetailsContent"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('Student Events Script: Loaded');
+});
+
+function viewEventDetails(eventId) {
+    console.log('Viewing event details for ID:', eventId);
+    fetch(`/api/event_details?id=${eventId}`)
+        .then(response => {
+            if (!response.ok) throw new Error('Failed to fetch event details');
+            return response.json();
+        })
+        .then(data => {
+            const content = document.getElementById('eventDetailsContent');
+            content.innerHTML = `
+                <div class="mb-3"><h6>Title</h6><p>${data.title}</p></div>
+                <div class="mb-3"><h6>Date</h6><p>${data.event_date}</p></div>
+                <div class="mb-3"><h6>Type</h6><p>${data.event_type}</p></div>
+                <div class="mb-3"><h6>Description</h6><p>${data.description || 'No description'}</p></div>
+                <div class="mb-3"><h6>Departments</h6><p>${data.departments ? data.departments.join(', ') : 'All'}</p></div>
+                <div class="mb-3"><h6>Courses</h6><p>${data.courses ? data.courses.join(', ') : 'All'}</p></div>
+                <div class="mb-3"><h6>Status</h6><span class="badge bg-${data.status === 'published' ? 'success' : 'warning'}">${data.status}</span></div>
+            `;
+            new bootstrap.Modal(document.getElementById('eventDetailsModal')).show();
+        })
+        .catch(error => {
+            console.error('Error fetching event details:', error);
+            if (typeof toastr !== 'undefined') {
+                toastr.error('Failed to load event details');
+            } else {
+                alert('Failed to load event details');
+            }
+        });
+}
+</script>
+{% endblock %}

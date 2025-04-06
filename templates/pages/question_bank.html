@@ -1,0 +1,165 @@
+{% extends 'layouts/main.html' %}
+{% block content %}
+<div class="container-fluid mt-4">
+    <!-- Breadcrumb and Add Button -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{{ url_for('admin_dashboard') }}">Dashboard</a></li>
+                    <li class="breadcrumb-item active">Question Bank</li>
+                </ol>
+            </nav>
+        </div>
+        <div class="col-md-6 text-end">
+            <a href="{{ url_for('download_questionbank_template') }}" class="btn btn-success">
+                <i class="bi bi-download"></i> Download Template
+            </a>
+            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#uploadModal">
+                <i class="bi bi-plus-circle"></i> Add Question Bank
+            </button>
+        </div>
+    </div>
+
+    <!-- Modal for Adding Question Bank -->
+    <div class="modal fade" id="uploadModal" tabindex="-1" aria-labelledby="uploadModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="uploadModalLabel">Add Question Bank</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form action="/upload_question_bank" method="POST" enctype="multipart/form-data">
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="questionBankName" class="form-label">Question Bank Name:</label>
+                            <input 
+                                type="text" 
+                                class="form-control" 
+                                id="questionBankName" 
+                                name="question_name" 
+                                placeholder="Enter the question bank name" 
+                                required 
+                            />
+                        </div>
+                        <div class="mb-3">
+                            <label for="questionType" class="form-label">Question Difficulty Level:</label>
+                            <select 
+                                class="form-select" 
+                                id="questionType" 
+                                name="difficulty" 
+                                required
+                            >
+                                <option value="" disabled selected>Select difficulty level</option>
+                                <option value="Easy">Easy</option>
+                                <option value="Normal">Normal</option>
+                                <option value="Hard">Hard</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="fileInput" class="form-label">Upload Excel/CSV File (Optional):</label>
+                            <input 
+                                type="file" 
+                                class="form-control" 
+                                id="fileInput" 
+                                name="file" 
+                                accept=".csv, .xlsx" 
+                            />
+                            <small class="text-muted">Accepted formats: .csv, .xlsx</small>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Submit</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Question Bank Table -->
+    <div class="row">
+        <div class="col">
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between mb-3">
+                        <h4>Question Bank</h4>
+                        <select id="difficultyFilter" class="form-select w-auto" onchange="filterDifficulty()">
+                            <option value="">All Difficulties</option>
+                            <option value="Easy">Easy</option>
+                            <option value="Normal">Normal</option>
+                            <option value="Hard">Hard</option>
+                        </select>
+                    </div>
+                    <table id="questionBankTable" class="table table-striped table-bordered">
+                        <thead>
+                            <tr>
+                                <th>S.No</th>
+                                <th>Question Bank Name</th>
+                                <th>Difficulty</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            
+<script>
+    // Fetch and populate the question bank table
+    document.addEventListener("DOMContentLoaded", function () {
+        fetch("/view_question_banks")
+            .then((response) => response.json())
+            .then((data) => {
+                const tableBody = document.querySelector("#questionBankTable tbody");
+                tableBody.innerHTML = "";
+                data.forEach((item, index) => {
+                    const row = `
+                        <tr>
+                            <td>${index + 1}</td>
+                            <td>${item.name}</td>
+                            <td>${item.difficulty}</td>
+                            <td>
+                                <div class="d-flex justify-content-around align-items-center">
+                                    <button class="btn btn-link p-0 me-2" onclick="redirectToDetails(${item.id})">
+                                        <i class="bi bi-eye fs-5 text-info"></i>
+                                    </button>
+                                    <button class="btn btn-link p-0 me-2" onclick="editQuestionBank(${item.id})">
+                                        <i class="bi bi-pencil fs-5 text-warning"></i>
+                                    </button>
+                                    <button class="btn btn-link p-0" onclick="deleteQuestionBank(${item.id})">
+                                        <i class="bi bi-trash fs-5 text-danger"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>`;
+                    tableBody.insertAdjacentHTML("beforeend", row);
+                });
+            })
+            .catch((error) => console.error("Error fetching question bank data:", error));
+    });
+
+
+   function redirectToDetails(id) {
+    window.location.href = `/view_question_bank.html?id=${id}`;
+}
+
+
+</script>
+
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+
+ 
+
+
+
+
+
+
+

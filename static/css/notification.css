@@ -1,0 +1,170 @@
+.badge-position {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+  }
+
+  .notifi{
+    font-size: 20px;
+    padding: 3%;
+    margin: 0;
+    background-color: #6964DC;
+
+  }
+  .notification-popup {
+    position: absolute;
+    top: 50px;
+    align-items: center;
+    right: 0;
+
+    width: 350px;
+    max-height: 400px;
+    overflow-y: overlay;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 15px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    visibility: hidden;
+    opacity: 0;
+    transform: translateY(-20px);
+    transition: all 0.3s ease;
+    pointer-events: none;
+  }
+
+  .notification-popup.active {
+    visibility: visible;
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto; /* Re-enable interactions */
+  }
+
+  .notification-popup::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  
+
+  
+  .notification-popup::-webkit-scrollbar-track {
+    background: transparent;
+    margin: 8px 0;
+  }
+  
+  .notification-popup::-webkit-scrollbar-thumb {
+    background-color: #cbd5e1;
+    border-radius: 50px;
+  }
+  
+  .notification-popup::-webkit-scrollbar-thumb:hover {
+    background-color: #94a3b8;
+  }
+  
+  /* Rest of the popup styles */
+  .notification-popup::before {
+    content: '';
+    position: absolute;
+  
+    right: 15px;
+    width: 0;
+    height: 0;
+    border-left: 8px solid transparent;
+    border-right: 8px solid transparent;
+    border-bottom: 9px solid #fff;
+    z-index: 2;
+  }
+  
+  .notification-popup::after {
+    content: '';
+    position: absolute;
+    top: -10px; /* Position above the popup */
+    right: 30px; /* Align the triangle with the bell icon */
+    width: 0;
+    height: 0;
+    border-left: 10px solid transparent;
+    border-right: 10px solid transparent;
+    border-bottom: 10px solid #fff; /* Matches the popup background */
+    box-shadow: 0 -1px 1px rgba(0, 0, 0, 0.1); /* Optional shadow for depth */
+  }
+  
+  .notification-popup.show {
+    opacity: 1;
+    transform: translateY(0);
+    visibility: visible;
+
+  pointer-events: auto;
+  }
+  .notification-popup .list-group-item {
+    display: flex;
+    padding: 10px;
+    background-color: #ECEBF4;
+    border-width: 3px;
+    justify-content: space-between;
+    align-items: center;
+    transition: all 0.3s ease;
+
+  }
+  .empty-message {
+    padding: 20px;
+    text-align: center;
+    color: #6c757d;
+    opacity: 0;
+    transform: translateY(-10px);
+    transition: all 0.3s ease;
+}
+
+.empty-message.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+    .btn-danger{
+        background-color: white;
+        color: black;
+        border: none;
+        border-radius: 50% 50%;
+    }
+
+    .bi-trash{
+      border: none;
+      background-color: transparent;
+      cursor: pointer;
+      border-radius: 40%;
+    }
+    .bi-trash:hover{
+      
+      background-color: rgba(0, 0, 0, 0.1); 
+
+  
+    }
+
+
+/* Media Queries for Responsiveness */
+@media (max-width: 768px) {
+  .notification-popup {
+    width: 95%; /* Wider on smaller screens */
+    max-height: 300px; /* Shorter height */
+    top: 2.5rem;
+  }
+
+  .notifi {
+    font-size: 1rem; /* Smaller icon */
+    padding: 0.5rem;
+  }
+
+  .notification-popup .list-group-item {
+    padding: 0.5rem; /* Smaller padding */
+    font-size: 0.9rem; /* Smaller text */
+  }
+}
+
+@media (max-width: 480px) {
+  .notification-popup {
+    width: 100%; /* Full width on tiny screens */
+    max-height: 250px;
+    border-radius: 10px; /* Slightly smaller radius */
+  }
+
+  .notifi {
+    font-size: 0.875rem;
+    padding: 0.4rem;
+  }
+}

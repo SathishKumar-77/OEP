@@ -1,0 +1,138 @@
+/* General Reset */
+* {
+    --primary-color: #6a11cb;
+    --secondary-color: #9abfff;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #333;
+}
+
+/* Login Page Container */
+.login-page {
+    width: 100%;
+    max-width: 400px;
+    padding: 20px;
+}
+
+/* Card Styling */
+.card {
+    background: #fff;
+    padding: 40px;
+    border-radius: 12px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+    text-align: center;
+    width: 80%; /* Base width set to a percentage */
+    max-width: 800px; /* Maximum width limit for large screens */
+    min-width: 350px; /* Minimum width for smaller screens */
+    min-height: 350px; /* Minimum height for smaller content */
+    transition: all 0.3s ease-in-out; /* Smooth transition when size changes */
+}
+
+/* Subtitle */
+.subtitle {
+    font-size: 24px;
+    font-weight: 600;
+    margin-bottom: 20px;
+    color: #333;
+}
+
+/* Input Groups */
+.input-group {
+    margin-bottom: 20px;
+    text-align: left;
+}
+
+.input-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-size: 14px;
+    color: #555;
+}
+
+.input-group input, .input-group select {
+    width: 100%;
+    padding: 10px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    transition: 0.3s ease;
+}
+
+.input-group input:focus, .input-group select:focus {
+    border-color: #6c63ff;
+    outline: none;
+}
+
+/* Button */
+.btn {
+    width: 100%;
+    padding: 12px;
+    font-size: 16px;
+    background: linear-gradient(90deg, #6c63ff, #48a9fe);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: 0.3s ease;
+}
+
+.btn:hover {
+    opacity: 0.9;
+}
+
+   /* Toast container */
+.toast {
+    position: fixed;
+    top: 20px; /* Adjust the distance from the top */
+    left: 52%; /* Center horizontally */
+    transform: translateX(-50%); /* Offset to truly center */
+    background-color: #f44336; /* Red background for error */
+    color: white;
+    padding: 20px 30px;
+    border-radius: 5px;
+    font-size: 16px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
+    opacity: 0; /* Hidden by default */
+    visibility: hidden; /* Hidden by default */
+    transition: opacity 0.5s ease, visibility 0.5s ease;
+    z-index: 9999; /* Make sure it appears above other content */
+}
+
+
+/* Show toast */
+.toast.show {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Responsive Design */
+
+@media (max-width: 768px) {
+    .card {
+        width: 90%;
+        padding: 30px;
+    }
+}
+
+@media (min-width: 1200px) {
+    .card {
+        width: 120%;
+        max-width: 1000px;
+        padding: 60px;
+    
+    }
+    .subtitle {
+        font-size: 20px;
+    }
+}

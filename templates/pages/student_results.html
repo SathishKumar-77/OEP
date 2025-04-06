@@ -1,0 +1,90 @@
+{% extends "layouts/main.html" %}
+{% block title %}All Exam Results{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="mb-4 text-center">All Exam Results</h1>
+    
+    {% if exam_results %}
+        <div class="accordion" id="resultsAccordion">
+            {% for exam_id, data in exam_results.items() %}
+            <div class="accordion-item shadow-sm mb-3">
+                <h2 class="accordion-header" id="heading{{ exam_id }}">
+                    <button class="accordion-button {% if loop.first %}collapsed{% endif %}" type="button" 
+                            data-bs-toggle="collapse" data-bs-target="#collapse{{ exam_id }}" 
+                            aria-expanded="{% if loop.first %}true{% else %}false{% endif %}" 
+                            aria-controls="collapse{{ exam_id }}">
+                        <div class="d-flex justify-content-between w-100">
+                            <span>{{ data.event.title }}</span>
+                            <span class="badge bg-primary ms-2">{{ data.score|round(2) }}%</span>
+                        </div>
+                    </button>
+                </h2>
+                <div id="collapse{{ exam_id }}" class="accordion-collapse collapse {% if loop.first %}show{% endif %}" 
+                     aria-labelledby="heading{{ exam_id }}" data-bs-parent="#resultsAccordion">
+                    <div class="accordion-body">
+                        <!-- Summary -->
+                        <div class="row text-center mb-3">
+                            <div class="col-md-4">
+                                <h6>Total Questions</h6>
+                                <p class="fw-bold">{{ data.total_questions }}</p>
+                            </div>
+                            <div class="col-md-4">
+                                <h6>Correct Answers</h6>
+                                <p class="fw-bold text-success">{{ data.correct_answers }}</p>
+                            </div>
+                            <div class="col-md-4">
+                                <h6>Score</h6>
+                                <p class="fw-bold text-primary">{{ data.score|round(2) }}%</p>
+                            </div>
+                        </div>
+                        <p><strong>Date:</strong> {{ data.event.event_date.strftime('%Y-%m-%d') }}</p>
+                        <p><strong>Duration:</strong> {{ data.exam.exam_duration }} minutes</p>
+                        <p><strong>Completed At:</strong> {{ data.completion.completed_at.strftime('%Y-%m-%d %H:%M:%S') }}</p>
+                        <p><strong>Status:</strong> 
+                            <span class="badge {% if data.completion.completion_status == 'success' %}bg-success{% else %}bg-warning{% endif %}">
+                                {{ data.completion.completion_status|capitalize }}
+                            </span>
+                        </p>
+
+                        <!-- Results Table -->
+                        <h5 class="mt-3">Question Details</h5>
+                        <table class="table table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Question ID</th>
+                                    <th>Your Answer</th>
+                                    <th>Correct?</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for result in data.results %}
+                                <tr>
+                                    <td>{{ result.question_id }}</td>
+                                    <td>{{ result.selected_answer }}</td>
+                                    <td>
+                                        <i class="bi {% if result.is_correct %}bi-check-circle-fill text-success{% else %}bi-x-circle-fill text-danger{% endif %}"></i>
+                                        {{ 'Yes' if result.is_correct else 'No' }}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="alert alert-info text-center">
+            No exam results available yet.
+        </div>
+    {% endif %}
+
+    <div class="text-center mt-4">
+        <a href="{{ url_for('student_events') }}" class="btn btn-outline-primary">
+            <i class="bi bi-arrow-left"></i> Back to Events
+        </a>
+    </div>
+</div>
+{% endblock %}

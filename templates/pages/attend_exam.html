@@ -1,0 +1,829 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ event.title }} - Exam</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <style>
+        :root {
+            --primary-color: #6a0dad;
+            --secondary-color: #8a2be2;
+            --light-purple: #e6e0fa;
+            --text-color: #333;
+            --white: #fff;
+        }
+
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            width: 100%;
+            overflow: hidden;
+            background: var(--light-purple);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overscroll-behavior: none;
+        }
+
+        .exam-container {
+            position: relative;
+            height: 100vh;
+            width: 100vw;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .timer {
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            background: #dc3545;
+            color: var(--white);
+            padding: 10px 15px;
+            border-radius: 5px;
+            z-index: 1000;
+            font-size: 1.2rem;
+            font-weight: bold;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        .webcam-container {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            z-index: 1000;
+            width: 150px;
+            height: 113px;
+            border: 3px solid var(--primary-color);
+            border-radius: 5px;
+            overflow: hidden;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+            background-color: #000;
+        }
+
+        #webcamVideo {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .recording-indicator {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background-color: #dc3545;
+            animation: blink 1s infinite;
+        }
+
+        @keyframes blink {
+            0% { opacity: 1; }
+            50% { opacity: 0.3; }
+            100% { opacity: 1; }
+        }
+
+        .card {
+            width: 100%;
+            height: calc(100vh - 40px);
+            overflow-y: auto;
+            margin: 0;
+            border: none;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            background-color: var(--white);
+            border-radius: 10px;
+        }
+
+        .card-header {
+            padding: 1.2rem;
+            position: sticky;
+            top: 0;
+            z-index: 999;
+            background-color: var(--primary-color);
+            color: var(--white);
+            border-bottom: none;
+            border-radius: 10px 10px 0 0 !important;
+        }
+
+        .card-body {
+            padding: 2rem;
+        }
+
+        .question-block {
+            background-color: #f9f7ff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+            margin-bottom: 25px;
+            border-left: 4px solid var(--secondary-color);
+        }
+
+        .form-check {
+            margin-bottom: 0.75rem;
+            padding-left: 2rem;
+        }
+
+        .form-check-input {
+            margin-top: 0.3rem;
+            cursor: pointer;
+        }
+
+        .form-check-input:checked {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+
+        .form-check-label {
+            margin-left: 0.5rem;
+            color: var(--text-color);
+            cursor: pointer;
+        }
+
+        .no-copy {
+            user-select: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+            padding: 10px 25px;
+            font-weight: 600;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--secondary-color);
+            border-color: var(--secondary-color);
+            transform: translateY(-2px);
+        }
+        
+        .status-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: var(--primary-color);
+            color: white;
+            padding: 5px 15px;
+            font-size: 0.85rem;
+            display: flex;
+            justify-content: space-between;
+            z-index: 1000;
+        }
+
+        #warning-message {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: rgba(220, 53, 69, 0.9);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            font-weight: bold;
+            text-align: center;
+            z-index: 9999;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+            display: none;
+            max-width: 80%;
+        }
+
+        .progress-container {
+            padding: 10px 0;
+            background-color: white;
+            position: sticky;
+            top: 71px;
+            z-index: 998;
+            margin-bottom: 15px;
+        }
+
+        .progress {
+            height: 10px;
+            border-radius: 5px;
+        }
+
+        .progress-bar {
+            background-color: var(--secondary-color);
+        }
+
+        .camera-permission-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: white;
+        }
+
+        .camera-permission-overlay h3 {
+            margin-bottom: 20px;
+        }
+
+        .camera-permission-overlay button {
+            padding: 10px 20px;
+            background-color: var(--primary-color);
+            border: none;
+            color: white;
+            border-radius: 5px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .blocked-message {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(220, 53, 69, 0.95);
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+            font-size: 24px;
+            font-weight: bold;
+            text-align: center;
+            padding: 20px;
+        }
+
+        @media print {
+            body {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="camera-permission-overlay" id="cameraPermissionOverlay">
+        <h3>Camera Access Required</h3>
+        <p>This exam requires access to your camera for proctoring purposes.</p>
+        <p>Please click the button below to grant camera access.</p>
+        <button id="enableCameraBtn">Enable Camera</button>
+    </div>
+
+    <div class="blocked-message" id="blockedMessage" style="display: none;">
+        Navigation Blocked! This incident has been recorded.
+        <br><br>
+        Please resume your exam.
+    </div>
+
+    <div class="exam-container">
+        <div class="timer" id="examTimer">Time Left: Loading...</div>
+        
+        <div class="webcam-container" id="webcamContainer">
+            <video id="webcamVideo" autoplay muted></video>
+            <div class="recording-indicator"></div>
+        </div>
+        
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title mb-0">{{ event.title }}</h3>
+                <small>Duration: {{ exam.exam_duration }} minutes | Question Bank: {{ question_bank.name }} ({{ question_bank.difficulty }})</small>
+            </div>
+            
+            <div class="progress-container">
+                <div class="progress">
+                    <div class="progress-bar" role="progressbar" style="width: 0%" id="examProgress"></div>
+                </div>
+            </div>
+            
+            <div class="card-body">
+                <div id="warning-message"></div>
+                
+                <form method="POST" id="examForm">
+                    {% for question in questions %}
+                    <!-- Replace the existing question block with this fixed version -->
+                    <div class="mb-4 question-block" data-question-id="{{ question.id }}">
+                        <h5 class="mb-3">Question {{ loop.index }}: <span class="no-copy">{{ question.question }}</span></h5>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="question_{{ question.id }}" id="option_a_{{ question.id }}" value="{{ question.option1 }}" required>
+                            <label class="form-check-label no-copy" for="option_a_{{ question.id }}">{{ question.option1 }}</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="question_{{ question.id }}" id="option_b_{{ question.id }}" value="{{ question.option2 }}">
+                            <label class="form-check-label no-copy" for="option_b_{{ question.id }}">{{ question.option2 }}</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="question_{{ question.id }}" id="option_c_{{ question.id }}" value="{{ question.option3 }}">
+                            <label class="form-check-label no-copy" for="option_c_{{ question.id }}">{{ question.option3 }}</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="question_{{ question.id }}" id="option_d_{{ question.id }}" value="{{ question.option4 }}">
+                            <label class="form-check-label no-copy" for="option_d_{{ question.id }}">{{ question.option4 }}</label>
+                        </div>
+                    </div>
+                    {% endfor %}
+                    <button type="button" class="btn btn-primary" id="submitBtn" onclick="submitExam()">Submit Exam</button>
+                </form>
+            </div>
+        </div>
+        
+        <div class="status-bar">
+            <span id="connectionStatus">Connection: Online</span>
+            <span id="activityLog">Activity Monitoring: Active</span>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+    const examDuration = {{ exam.exam_duration }} * 60 || 3600;
+    let timeLeft = examDuration;
+    let warningCount = 0;
+    let isRecording = false;
+    let mediaRecorder;
+    let recordedChunks = [];
+    let violationLog = [];
+    let cameraStream = null;
+    let disableNavigation = true;
+    let pageLoadTime = Date.now();
+    let navigationAttempts = 0;
+    
+    function preventNavigation() {
+        const originalPushState = history.pushState;
+        const originalReplaceState = history.replaceState;
+        const originalBack = history.back;
+        const originalForward = history.forward;
+        const originalGo = history.go;
+        
+        history.pushState = function() {
+            showBlockedMessage('History pushState blocked');
+            return false;
+        };
+        
+        history.replaceState = function() {
+            showBlockedMessage('History replaceState blocked');
+            return false;
+        };
+        
+        history.back = function() {
+            showBlockedMessage('History back navigation blocked');
+            return false;
+        };
+        
+        history.forward = function() {
+            showBlockedMessage('History forward navigation blocked');
+            return false;
+        };
+        
+        history.go = function() {
+            showBlockedMessage('History navigation blocked');
+            return false;
+        };
+        
+        const locationDescriptor = Object.getOwnPropertyDescriptor(window, 'location');
+        if (locationDescriptor && locationDescriptor.configurable) {
+            const originalLocation = window.location;
+            Object.defineProperty(window, 'location', {
+                get: function() {
+                    return originalLocation;
+                },
+                set: function(value) {
+                    showBlockedMessage('Page navigation blocked');
+                    recordViolation('Navigation attempt: ' + value);
+                    return originalLocation;
+                },
+                configurable: false
+            });
+        }
+        
+        const originalReload = window.location.reload;
+        window.location.reload = function() {
+            showBlockedMessage('Page reload blocked');
+            recordViolation('Reload attempt');
+            return false;
+        };
+    }
+    
+    function showBlockedMessage(reason) {
+        navigationAttempts++;
+        recordViolation(reason);
+        const blockedMsg = document.getElementById('blockedMessage');
+        blockedMsg.style.display = 'flex';
+        setTimeout(() => {
+            blockedMsg.style.display = 'none';
+        }, 3000);
+    }
+    
+    document.getElementById('enableCameraBtn').addEventListener('click', () => {
+        setTimeout(() => {
+            document.getElementById('cameraPermissionOverlay').style.display = 'none';
+        }, 1000);
+        
+        initWebcam().then(() => {
+            document.getElementById('cameraPermissionOverlay').style.display = 'none';
+            initializeExam();
+        }).catch(err => {
+            document.getElementById('cameraPermissionOverlay').style.display = 'none';
+            try {
+                initializeExam();
+            } catch(e) {
+                startTimer();
+            }
+        });
+    });
+    
+    function initWebcam() {
+        return new Promise((resolve, reject) => {
+            if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                navigator.mediaDevices.getUserMedia({ 
+                    video: { facingMode: "user" },
+                    audio: false 
+                }).then(stream => {
+                    cameraStream = stream;
+                    const video = document.getElementById('webcamVideo');
+                    video.srcObject = stream;
+                    document.getElementById('cameraPermissionOverlay').style.display = 'none';
+                    video.onloadedmetadata = () => {
+                        video.play().then(() => {
+                            setupRecording(stream);
+                            startRecording();
+                            startTimer();
+                            updateProgress();
+                            trackUserActivity();
+                            enterFullscreen();
+                            resolve(true);
+                        }).catch(err => {
+                            document.getElementById('cameraPermissionOverlay').style.display = 'none';
+                            startTimer();
+                            updateProgress();
+                            trackUserActivity();
+                            resolve(true);
+                        });
+                    };
+                }).catch(err => {
+                    reject('Camera access denied: ' + err);
+                });
+            } else {
+                reject('Media devices not supported');
+            }
+        });
+    }
+
+    function initializeExam() {
+        startTimer();
+        updateProgress();
+        trackUserActivity();
+        document.querySelectorAll('input[type="radio"]').forEach(input => {
+            input.addEventListener('change', updateProgress);
+        });
+        enterFullscreen();
+    }
+
+    function enterFullscreen() {
+        const element = document.documentElement;
+        if (element.requestFullscreen) {
+            element.requestFullscreen().catch(err => {
+                recordViolation('Fullscreen request failed: ' + err);
+            });
+        } else if (element.mozRequestFullScreen) {
+            element.mozRequestFullScreen();
+        } else if (element.webkitRequestFullscreen) {
+            element.webkitRequestFullscreen();
+        } else if (element.msRequestFullscreen) {
+            element.msRequestFullscreen();
+        }
+    }
+
+    function setupBrowserLockdown() {
+        document.addEventListener('contextmenu', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            recordViolation('Right-click attempt');
+            return false;
+        }, true);
+
+        document.addEventListener('keydown', (e) => {
+            const blockedKeys = ['F1', 'F2', 'F3', 'F4', 'F5', 'F6', 'F7', 'F8', 'F9', 'F10', 'F11', 'F12', 
+                                'Escape', 'Tab', 'r', 'c', 'v', 'x', 'p', 'a', 'n', 'w', 't', 'u'];
+            
+            if (e.ctrlKey && blockedKeys.includes(e.key)) {
+                e.preventDefault();
+                e.stopPropagation();
+                recordViolation('Keyboard shortcut blocked: Ctrl+' + e.key);
+                return false;
+            }
+            
+            if (e.altKey && e.key === 'F4') {
+                e.preventDefault();
+                e.stopPropagation();
+                recordViolation('Alt+F4 blocked');
+                return false;
+            }
+            
+            if (e.altKey && e.key === 'Tab') {
+                e.preventDefault();
+                e.stopPropagation();
+                recordViolation('Alt+Tab blocked');
+                return false;
+            }
+            
+            if (e.key === 'Meta' || e.key === 'OS') {
+                e.preventDefault();
+                e.stopPropagation();
+                recordViolation('Windows/Meta key blocked');
+                return false;
+            }
+            
+            if (e.ctrlKey && e.shiftKey) {
+                e.preventDefault();
+                e.stopPropagation();
+                recordViolation('Ctrl+Shift combination blocked');
+                return false;
+            }
+        }, true);
+
+        document.addEventListener('fullscreenchange', handleFullscreenChange);
+        document.addEventListener('mozfullscreenchange', handleFullscreenChange);
+        document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
+        document.addEventListener('msfullscreenchange', handleFullscreenChange);
+        
+        document.addEventListener('visibilitychange', () => {
+            if (document.visibilityState === 'hidden') {
+                recordViolation('Tab visibility changed to hidden');
+            }
+        });
+        
+        window.addEventListener('beforeunload', (e) => {
+            if (disableNavigation) {
+                recordViolation('Page unload attempt');
+                e.preventDefault();
+                e.returnValue = 'Leaving will terminate your exam';
+                return e.returnValue;
+            }
+        });
+        
+        setInterval(checkDevTools, 1000);
+        preventDebugging();
+    }
+
+    function handleFullscreenChange() {
+        if (!document.fullscreenElement && 
+            !document.mozFullScreenElement && 
+            !document.webkitFullscreenElement && 
+            !document.msFullscreenElement) {
+            recordViolation('Exited fullscreen mode');
+            showWarning('Fullscreen mode is required. Please return to fullscreen.');
+            setTimeout(enterFullscreen, 1000);
+        }
+    }
+
+    function checkDevTools() {
+        const widthThreshold = window.outerWidth - window.innerWidth > 200;
+        const heightThreshold = window.outerHeight - window.innerHeight > 200;
+        
+        if (widthThreshold || heightThreshold) {
+            recordViolation('Potential developer tools detected');
+            showWarning('Developer tools detected. This incident has been recorded.');
+        }
+        
+        const startTime = performance.now();
+        console.log('Exam security check');
+        console.clear();
+        const endTime = performance.now();
+        
+        if (endTime - startTime > 50) {
+            recordViolation('Console may be open');
+        }
+    }
+
+    function preventDebugging() {
+        const noopFunc = function() {};
+        const consoleProperties = ['log', 'debug', 'info', 'warn', 'error', 'table', 'trace'];
+        const realConsole = { ...console };
+        
+        consoleProperties.forEach(prop => {
+            if (console[prop]) {
+                Object.defineProperty(console, prop, {
+                    get: function() {
+                        recordViolation('Console ' + prop + ' accessed');
+                        return noopFunc;
+                    },
+                    set: function() {
+                        return noopFunc;
+                    },
+                    configurable: false
+                });
+            }
+        });
+        
+        setInterval(() => {
+            const startTime = Date.now();
+            debugger;
+            const endTime = Date.now();
+            if (endTime - startTime > 100) {
+                recordViolation('Debugger statement triggered');
+            }
+        }, 1000);
+    }
+    function setupRecording(stream) {
+        try {
+            const options = { mimeType: 'video/webm;codecs=vp9' };
+            mediaRecorder = new MediaRecorder(stream, options);
+            
+            mediaRecorder.ondataavailable = event => {
+                if (event.data.size > 0) {
+                    recordedChunks.push(event.data);
+                    console.log('Recorded chunk available, size:', event.data.size);
+                }
+            };
+            
+            mediaRecorder.onstop = () => {
+                isRecording = false;
+                console.log('Recording stopped, chunks:', recordedChunks.length);
+                startRecording();
+            };
+        } catch (err) {
+            console.error('Media recorder setup failed:', err);
+        }
+    }
+
+    function startRecording() {
+        if (mediaRecorder && mediaRecorder.state !== 'recording') {
+            try {
+                mediaRecorder.start(30000);
+                isRecording = true;
+                console.log('Recording started');
+            } catch (err) {
+                console.error('Failed to start recording:', err);
+            }
+        }
+    }
+
+    function recordViolation(violationType) {
+        warningCount++;
+        const timestamp = new Date().toISOString();
+        const violation = {
+            time: timestamp,
+            type: violationType,
+            examTime: examDuration - timeLeft,
+        };
+        violationLog.push(violation);
+        console.log('Violation recorded:', violation);
+        if (violationType.includes('navigation') || 
+            violationType.includes('reload') || 
+            violationType.includes('fullscreen') ||
+            violationType.includes('Tab')) {
+            showWarning('Security violation detected: ' + violationType);
+        }
+    }
+    function showWarning(message) {
+        const warning = document.getElementById('warning-message');
+        warning.textContent = message;
+        warning.style.display = 'block';
+        setTimeout(() => {
+            warning.style.display = 'none';
+        }, 4000);
+    }
+    function startTimer() {
+        const timerElement = document.getElementById('examTimer');
+        const interval = setInterval(() => {
+            const minutes = Math.floor(timeLeft / 60);
+            const seconds = timeLeft % 60;
+            timerElement.textContent = `Time Left: ${minutes}:${seconds < 10 ? '0' + seconds : seconds}`;
+            updateProgress();
+            if (timeLeft <= 300) {
+                timerElement.style.backgroundColor = '#dc3545';
+                timerElement.style.animation = 'blink 1s infinite';
+            }
+            if (timeLeft <= 0) {
+                clearInterval(interval);
+                submitExam();
+            }
+            timeLeft--;
+        }, 1000);
+    }
+    function updateProgress() {
+        const totalQuestions = document.querySelectorAll('.question-block').length;
+        const answeredQuestions = document.querySelectorAll('input[type="radio"]:checked').length;
+        const progressPercentage = (answeredQuestions / totalQuestions) * 100;
+        document.getElementById('examProgress').style.width = `${progressPercentage}%`;
+        document.getElementById('examProgress').setAttribute('aria-valuenow', progressPercentage);
+    }
+
+    function trackUserActivity() {
+        let lastActivity = Date.now();
+        
+        const updateActivity = () => {
+            lastActivity = Date.now();
+            document.getElementById('activityLog').textContent = 'Activity Monitoring: Active';
+        };
+        
+        setInterval(() => {
+            const inactiveTime = (Date.now() - lastActivity) / 1000;
+            if (inactiveTime > 30) {
+                document.getElementById('activityLog').textContent = 'Activity Monitoring: Inactive!';
+                recordViolation('Inactivity detected');
+            }
+        }, 5000);
+        
+        window.addEventListener('online', () => {
+            document.getElementById('connectionStatus').textContent = 'Connection: Online';
+        });
+        
+        window.addEventListener('offline', () => {
+            document.getElementById('connectionStatus').textContent = 'Connection: Offline';
+            recordViolation('Connection lost');
+        });
+        
+        document.addEventListener('mousemove', updateActivity);
+        document.addEventListener('click', updateActivity);
+        document.addEventListener('keydown', updateActivity);
+        document.addEventListener('scroll', updateActivity);
+    }
+
+    function submitExam() {
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "You won't be able to modify your answers after submission!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#6a0dad',
+            cancelButtonColor: '#dc3545',
+            confirmButtonText: 'Yes, submit!',
+            cancelButtonText: 'No, continue'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                if (mediaRecorder && isRecording) {
+                    mediaRecorder.stop();
+                }
+                
+                const form = document.getElementById('examForm');
+                const formData = new FormData(form);
+                const answers = {};
+                
+                formData.forEach((value, key) => {
+                    if (key.startsWith('question_')) {
+                        const questionId = key.split('_')[1];
+                        answers[questionId] = value;
+                    }
+                });
+                
+                fetch(`/submit_exam/{{ exam.id }}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ answers: answers })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.message) {
+    Swal.fire({
+        title: 'Submitted!',
+        text: 'Your exam has been successfully submitted.',
+        icon: 'success',
+        confirmButtonColor: '#6a0dad'
+    }).then(() => {
+        disableNavigation = false;
+        // Navigate to a different page instead of submitting the form
+        window.location.href = '/student_events'; // Replace with your desired URL
+    });
+}
+                })
+                .catch(error => {
+                    Swal.fire({
+                        title: 'Error!',
+                        text: 'There was an error submitting your exam.',
+                        icon: 'error',
+                        confirmButtonColor: '#6a0dad'
+                    });
+                });
+            }
+        });
+    }
+
+    window.addEventListener('unload', () => {
+        if (mediaRecorder && isRecording) {
+            mediaRecorder.stop();
+        }
+        const formData = new FormData(document.getElementById('examForm'));
+        navigator.sendBeacon('/submit-exam', formData);
+    });
+
+    if (window.performance && performance.navigation.type === performance.navigation.TYPE_RELOAD) {
+        recordViolation('Page was refreshed');
+        showWarning('Page refresh detected. This incident has been recorded.');
+    }
+
+    if (document.readyState === "complete") {
+        preventNavigation();
+    } else {
+        window.addEventListener("load", preventNavigation);
+    }
+    </script>
+</body>
+</html>
