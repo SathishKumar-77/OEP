@@ -94,6 +94,7 @@
               <i class="bi bi-archive"></i> <span>Question Banks/Questions</span>
             </a>
           {% elif session['role'] == 'Student' %}
+<<<<<<< HEAD
             <a href="{{ url_for('student_events')}}" class="sidebar-nav-item {% if request.endpoint == 'student_events' %}active{% endif %}">
               <i class="bi bi-pencil-square"></i> <span>Check Exam / View Exam</span>
             </a>
@@ -103,6 +104,8 @@
             <a href="#" class="sidebar-nav-item {% if request.endpoint == 'appeal' %}active{% endif %}">
               <i class="bi bi-chat-dots"></i> <span>Appeal</span>
             </a>
+=======
+>>>>>>> 6bd70aa5ace8f821e53980252cccfcfebeb2212d
             <a href="{{ url_for('dashboard') }}" 
                   class="sidebar-nav-item {% if request.endpoint == 'dashboard' %}active{% endif %}">
               <i class="bi bi-speedometer2"></i> <span>Dashboard</span>

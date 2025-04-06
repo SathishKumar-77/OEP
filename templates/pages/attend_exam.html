@@ -5,7 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ event.title }} - Exam</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<<<<<<< HEAD
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+=======
+>>>>>>> 6bd70aa5ace8f821e53980252cccfcfebeb2212d
     <style>
         :root {
             --primary-color: #6a0dad;
@@ -23,7 +26,11 @@
             overflow: hidden;
             background: var(--light-purple);
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+<<<<<<< HEAD
             overscroll-behavior: none;
+=======
+            overscroll-behavior: none; /* Prevents pull-to-refresh */
+>>>>>>> 6bd70aa5ace8f821e53980252cccfcfebeb2212d
         }
 
         .exam-container {
@@ -194,6 +201,10 @@
             max-width: 80%;
         }
 
+<<<<<<< HEAD
+=======
+        /* Progress bar */
+>>>>>>> 6bd70aa5ace8f821e53980252cccfcfebeb2212d
         .progress-container {
             padding: 10px 0;
             background-color: white;
@@ -268,6 +279,10 @@
     </style>
 </head>
 <body>
+<<<<<<< HEAD
+=======
+    <!-- Camera permission overlay -->
+>>>>>>> 6bd70aa5ace8f821e53980252cccfcfebeb2212d
     <div class="camera-permission-overlay" id="cameraPermissionOverlay">
         <h3>Camera Access Required</h3>
         <p>This exam requires access to your camera for proctoring purposes.</p>
@@ -275,6 +290,10 @@
         <button id="enableCameraBtn">Enable Camera</button>
     </div>
 
+<<<<<<< HEAD
+=======
+    <!-- Blocked navigation message (hidden by default) -->
+>>>>>>> 6bd70aa5ace8f821e53980252cccfcfebeb2212d
     <div class="blocked-message" id="blockedMessage" style="display: none;">
         Navigation Blocked! This incident has been recorded.
         <br><br>
@@ -304,6 +323,7 @@
             <div class="card-body">
                 <div id="warning-message"></div>
                 
+<<<<<<< HEAD
                 <form method="POST" id="examForm">
                     {% for question in questions %}
                     <!-- Replace the existing question block with this fixed version -->
@@ -323,11 +343,35 @@
                         </div>
                         <div class="form-check">
                             <input class="form-check-input" type="radio" name="question_{{ question.id }}" id="option_d_{{ question.id }}" value="{{ question.option4 }}">
+=======
+                <form method="POST" id="examForm" onsubmit="return confirmSubmission()">
+                    {% for question in questions %}
+                    <div class="mb-4 question-block" data-question-id="{{ question.id }}">
+                        <h5 class="mb-3">Question {{ loop.index }}: <span class="no-copy">{{ question.question }}</span></h5>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="question_{{ question.id }}" id="option_a_{{ question.id }}" value="A" required>
+                            <label class="form-check-label no-copy" for="option_a_{{ question.id }}">{{ question.option1 }}</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="question_{{ question.id }}" id="option_b_{{ question.id }}" value="B">
+                            <label class="form-check-label no-copy" for="option_b_{{ question.id }}">{{ question.option2 }}</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="question_{{ question.id }}" id="option_c_{{ question.id }}" value="C">
+                            <label class="form-check-label no-copy" for="option_c_{{ question.id }}">{{ question.option3 }}</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="question_{{ question.id }}" id="option_d_{{ question.id }}" value="D">
+>>>>>>> 6bd70aa5ace8f821e53980252cccfcfebeb2212d
                             <label class="form-check-label no-copy" for="option_d_{{ question.id }}">{{ question.option4 }}</label>
                         </div>
                     </div>
                     {% endfor %}
+<<<<<<< HEAD
                     <button type="button" class="btn btn-primary" id="submitBtn" onclick="submitExam()">Submit Exam</button>
+=======
+                    <button type="submit" class="btn btn-primary" id="submitBtn">Submit Exam</button>
+>>>>>>> 6bd70aa5ace8f821e53980252cccfcfebeb2212d
                 </form>
             </div>
         </div>
@@ -338,9 +382,15 @@
         </div>
     </div>
 
+<<<<<<< HEAD
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
     const examDuration = {{ exam.exam_duration }} * 60 || 3600;
+=======
+    <script>
+    // Exam configuration
+    const examDuration = {{ exam_duration }} * 60 || 3600; // Convert minutes to seconds or default to 1 hour
+>>>>>>> 6bd70aa5ace8f821e53980252cccfcfebeb2212d
     let timeLeft = examDuration;
     let warningCount = 0;
     let isRecording = false;
@@ -352,13 +402,23 @@
     let pageLoadTime = Date.now();
     let navigationAttempts = 0;
     
+<<<<<<< HEAD
     function preventNavigation() {
+=======
+    // Intercept reload and navigation
+    function preventNavigation() {
+        // Capture history object before anyone can modify it
+>>>>>>> 6bd70aa5ace8f821e53980252cccfcfebeb2212d
         const originalPushState = history.pushState;
         const originalReplaceState = history.replaceState;
         const originalBack = history.back;
         const originalForward = history.forward;
         const originalGo = history.go;
         
+<<<<<<< HEAD
+=======
+        // Redefine these methods
+>>>>>>> 6bd70aa5ace8f821e53980252cccfcfebeb2212d
         history.pushState = function() {
             showBlockedMessage('History pushState blocked');
             return false;
@@ -384,9 +444,19 @@
             return false;
         };
         
+<<<<<<< HEAD
         const locationDescriptor = Object.getOwnPropertyDescriptor(window, 'location');
         if (locationDescriptor && locationDescriptor.configurable) {
             const originalLocation = window.location;
+=======
+        // Override window.location
+        const locationDescriptor = Object.getOwnPropertyDescriptor(window, 'location');
+        if (locationDescriptor && locationDescriptor.configurable) {
+            // Store original location
+            const originalLocation = window.location;
+            
+            // Override location setter
+>>>>>>> 6bd70aa5ace8f821e53980252cccfcfebeb2212d
             Object.defineProperty(window, 'location', {
                 get: function() {
                     return originalLocation;
@@ -400,6 +470,10 @@
             });
         }
         
+<<<<<<< HEAD
+=======
+        // Override reload method
+>>>>>>> 6bd70aa5ace8f821e53980252cccfcfebeb2212d
         const originalReload = window.location.reload;
         window.location.reload = function() {
             showBlockedMessage('Page reload blocked');
@@ -408,16 +482,28 @@
         };
     }
     
+<<<<<<< HEAD
     function showBlockedMessage(reason) {
         navigationAttempts++;
         recordViolation(reason);
         const blockedMsg = document.getElementById('blockedMessage');
         blockedMsg.style.display = 'flex';
+=======
+    // Show blocked navigation message
+    function showBlockedMessage(reason) {
+        navigationAttempts++;
+        recordViolation(reason);
+        
+        const blockedMsg = document.getElementById('blockedMessage');
+        blockedMsg.style.display = 'flex';
+        
+>>>>>>> 6bd70aa5ace8f821e53980252cccfcfebeb2212d
         setTimeout(() => {
             blockedMsg.style.display = 'none';
         }, 3000);
     }
     
+<<<<<<< HEAD
     document.getElementById('enableCameraBtn').addEventListener('click', () => {
         setTimeout(() => {
             document.getElementById('cameraPermissionOverlay').style.display = 'none';
@@ -473,16 +559,103 @@
         });
     }
 
+=======
+    // Initialize exam
+    document.getElementById('enableCameraBtn').addEventListener('click', () => {
+    // Add direct hiding code here too
+    setTimeout(() => {
+        document.getElementById('cameraPermissionOverlay').style.display = 'none';
+    }, 1000);
+    
+    initWebcam().then(() => {
+        // Double ensure the overlay is hidden
+        document.getElementById('cameraPermissionOverlay').style.display = 'none';
+        initializeExam();
+    }).catch(err => {
+        // Even if there's an error, try hiding the overlay and starting anyway
+        document.getElementById('cameraPermissionOverlay').style.display = 'none';
+        try {
+            initializeExam();
+        } catch(e) {
+            // At minimum get the timer started
+            startTimer();
+        }
+    });
+});
+    
+    // Initialize webcam - returns a promise
+    // Initialize webcam - returns a promise
+function initWebcam() {
+    return new Promise((resolve, reject) => {
+        if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+            navigator.mediaDevices.getUserMedia({ 
+                video: { facingMode: "user" },
+                audio: false 
+            }).then(stream => {
+                cameraStream = stream;
+                const video = document.getElementById('webcamVideo');
+                video.srcObject = stream;
+                
+                // Force hide the overlay immediately after getting stream
+                document.getElementById('cameraPermissionOverlay').style.display = 'none';
+                
+                video.onloadedmetadata = () => {
+                    video.play().then(() => {
+                        // Setup recording
+                        setupRecording(stream);
+                        startRecording();
+                        
+                        // Forcefully start the exam
+                        startTimer();
+                        updateProgress();
+                        trackUserActivity();
+                        enterFullscreen();
+                        
+                        resolve(true);
+                    }).catch(err => {
+                        // Even if video play fails, hide overlay and start exam
+                        document.getElementById('cameraPermissionOverlay').style.display = 'none';
+                        startTimer();
+                        updateProgress();
+                        trackUserActivity();
+                        resolve(true);
+                    });
+                };
+            }).catch(err => {
+                reject('Camera access denied: ' + err);
+            });
+        } else {
+            reject('Media devices not supported');
+        }
+    });
+}
+    
+    // Initialize exam after camera permission
+>>>>>>> 6bd70aa5ace8f821e53980252cccfcfebeb2212d
     function initializeExam() {
         startTimer();
         updateProgress();
         trackUserActivity();
+<<<<<<< HEAD
         document.querySelectorAll('input[type="radio"]').forEach(input => {
             input.addEventListener('change', updateProgress);
         });
         enterFullscreen();
     }
 
+=======
+        
+        // Mark questions as answered
+        document.querySelectorAll('input[type="radio"]').forEach(input => {
+            input.addEventListener('change', updateProgress);
+        });
+        
+        // Fullscreen mode
+        enterFullscreen();
+    }
+    
+    // Enter fullscreen mode
+>>>>>>> 6bd70aa5ace8f821e53980252cccfcfebeb2212d
     function enterFullscreen() {
         const element = document.documentElement;
         if (element.requestFullscreen) {
@@ -497,8 +670,15 @@
             element.msRequestFullscreen();
         }
     }
+<<<<<<< HEAD
 
     function setupBrowserLockdown() {
+=======
+    
+    // Setup browser lockdown with multiple approaches
+    function setupBrowserLockdown() {
+        // Prevent context menu
+>>>>>>> 6bd70aa5ace8f821e53980252cccfcfebeb2212d
         document.addEventListener('contextmenu', (e) => {
             e.preventDefault();
             e.stopPropagation();
@@ -506,7 +686,13 @@
             return false;
         }, true);
 
+<<<<<<< HEAD
         document.addEventListener('keydown', (e) => {
+=======
+        // Block keyboard shortcuts - capture in capture phase
+        document.addEventListener('keydown', (e) => {
+            // Block navigation and developer tools keys
+>>>>>>> 6bd70aa5ace8f821e53980252cccfcfebeb2212d
             const blockedKeys = ['F1', 'F2', 'F3', 'F4', 'F5', 'F6', 'F7', 'F8', 'F9', 'F10', 'F11', 'F12', 
                                 'Escape', 'Tab', 'r', 'c', 'v', 'x', 'p', 'a', 'n', 'w', 't', 'u'];
             
@@ -517,6 +703,10 @@
                 return false;
             }
             
+<<<<<<< HEAD
+=======
+            // Block Alt+F4
+>>>>>>> 6bd70aa5ace8f821e53980252cccfcfebeb2212d
             if (e.altKey && e.key === 'F4') {
                 e.preventDefault();
                 e.stopPropagation();
@@ -524,6 +714,10 @@
                 return false;
             }
             
+<<<<<<< HEAD
+=======
+            // Block Alt+Tab
+>>>>>>> 6bd70aa5ace8f821e53980252cccfcfebeb2212d
             if (e.altKey && e.key === 'Tab') {
                 e.preventDefault();
                 e.stopPropagation();
@@ -531,6 +725,10 @@
                 return false;
             }
             
+<<<<<<< HEAD
+=======
+            // Block Windows key
+>>>>>>> 6bd70aa5ace8f821e53980252cccfcfebeb2212d
             if (e.key === 'Meta' || e.key === 'OS') {
                 e.preventDefault();
                 e.stopPropagation();
@@ -538,6 +736,10 @@
                 return false;
             }
             
+<<<<<<< HEAD
+=======
+            // Block Ctrl+Shift combinations
+>>>>>>> 6bd70aa5ace8f821e53980252cccfcfebeb2212d
             if (e.ctrlKey && e.shiftKey) {
                 e.preventDefault();
                 e.stopPropagation();
@@ -546,17 +748,29 @@
             }
         }, true);
 
+<<<<<<< HEAD
+=======
+        // Monitor fullscreen state
+>>>>>>> 6bd70aa5ace8f821e53980252cccfcfebeb2212d
         document.addEventListener('fullscreenchange', handleFullscreenChange);
         document.addEventListener('mozfullscreenchange', handleFullscreenChange);
         document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
         document.addEventListener('msfullscreenchange', handleFullscreenChange);
         
+<<<<<<< HEAD
+=======
+        // Detect tab visibility changes
+>>>>>>> 6bd70aa5ace8f821e53980252cccfcfebeb2212d
         document.addEventListener('visibilitychange', () => {
             if (document.visibilityState === 'hidden') {
                 recordViolation('Tab visibility changed to hidden');
             }
         });
         
+<<<<<<< HEAD
+=======
+        // Prevent unloading the page
+>>>>>>> 6bd70aa5ace8f821e53980252cccfcfebeb2212d
         window.addEventListener('beforeunload', (e) => {
             if (disableNavigation) {
                 recordViolation('Page unload attempt');
@@ -566,15 +780,27 @@
             }
         });
         
+<<<<<<< HEAD
         setInterval(checkDevTools, 1000);
         preventDebugging();
     }
 
+=======
+        // Check for developer tools
+        setInterval(checkDevTools, 1000);
+        
+        // Anti-debugging techniques
+        preventDebugging();
+    }
+    
+    // Handle fullscreen change
+>>>>>>> 6bd70aa5ace8f821e53980252cccfcfebeb2212d
     function handleFullscreenChange() {
         if (!document.fullscreenElement && 
             !document.mozFullScreenElement && 
             !document.webkitFullscreenElement && 
             !document.msFullscreenElement) {
+<<<<<<< HEAD
             recordViolation('Exited fullscreen mode');
             showWarning('Fullscreen mode is required. Please return to fullscreen.');
             setTimeout(enterFullscreen, 1000);
@@ -582,6 +808,20 @@
     }
 
     function checkDevTools() {
+=======
+            
+            recordViolation('Exited fullscreen mode');
+            showWarning('Fullscreen mode is required. Please return to fullscreen.');
+            
+            // Try to re-enter fullscreen after a short delay
+            setTimeout(enterFullscreen, 1000);
+        }
+    }
+    
+    // Attempt to detect developer tools
+    function checkDevTools() {
+        // Check window dimensions
+>>>>>>> 6bd70aa5ace8f821e53980252cccfcfebeb2212d
         const widthThreshold = window.outerWidth - window.innerWidth > 200;
         const heightThreshold = window.outerHeight - window.innerHeight > 200;
         
@@ -590,19 +830,38 @@
             showWarning('Developer tools detected. This incident has been recorded.');
         }
         
+<<<<<<< HEAD
+=======
+        // Debug logging - can help detect console usage
+>>>>>>> 6bd70aa5ace8f821e53980252cccfcfebeb2212d
         const startTime = performance.now();
         console.log('Exam security check');
         console.clear();
         const endTime = performance.now();
         
+<<<<<<< HEAD
+=======
+        // If console is open, this will take longer
+>>>>>>> 6bd70aa5ace8f821e53980252cccfcfebeb2212d
         if (endTime - startTime > 50) {
             recordViolation('Console may be open');
         }
     }
+<<<<<<< HEAD
 
     function preventDebugging() {
         const noopFunc = function() {};
         const consoleProperties = ['log', 'debug', 'info', 'warn', 'error', 'table', 'trace'];
+=======
+    
+    // Anti-debugging techniques
+    function preventDebugging() {
+        // Override console methods
+        const noopFunc = function() {};
+        const consoleProperties = ['log', 'debug', 'info', 'warn', 'error', 'table', 'trace'];
+        
+        // Store the real console for violation recording
+>>>>>>> 6bd70aa5ace8f821e53980252cccfcfebeb2212d
         const realConsole = { ...console };
         
         consoleProperties.forEach(prop => {
@@ -620,15 +879,28 @@
             }
         });
         
+<<<<<<< HEAD
+=======
+        // Detect debugger statement execution
+>>>>>>> 6bd70aa5ace8f821e53980252cccfcfebeb2212d
         setInterval(() => {
             const startTime = Date.now();
             debugger;
             const endTime = Date.now();
+<<<<<<< HEAD
+=======
+            
+>>>>>>> 6bd70aa5ace8f821e53980252cccfcfebeb2212d
             if (endTime - startTime > 100) {
                 recordViolation('Debugger statement triggered');
             }
         }, 1000);
     }
+<<<<<<< HEAD
+=======
+    
+    // Set up media recording
+>>>>>>> 6bd70aa5ace8f821e53980252cccfcfebeb2212d
     function setupRecording(stream) {
         try {
             const options = { mimeType: 'video/webm;codecs=vp9' };
@@ -637,6 +909,11 @@
             mediaRecorder.ondataavailable = event => {
                 if (event.data.size > 0) {
                     recordedChunks.push(event.data);
+<<<<<<< HEAD
+=======
+                    
+                    // In a production environment, you would upload chunks to server
+>>>>>>> 6bd70aa5ace8f821e53980252cccfcfebeb2212d
                     console.log('Recorded chunk available, size:', event.data.size);
                 }
             };
@@ -644,17 +921,31 @@
             mediaRecorder.onstop = () => {
                 isRecording = false;
                 console.log('Recording stopped, chunks:', recordedChunks.length);
+<<<<<<< HEAD
+=======
+                
+                // Start a new recording segment
+>>>>>>> 6bd70aa5ace8f821e53980252cccfcfebeb2212d
                 startRecording();
             };
         } catch (err) {
             console.error('Media recorder setup failed:', err);
         }
     }
+<<<<<<< HEAD
 
     function startRecording() {
         if (mediaRecorder && mediaRecorder.state !== 'recording') {
             try {
                 mediaRecorder.start(30000);
+=======
+    
+    // Start recording
+    function startRecording() {
+        if (mediaRecorder && mediaRecorder.state !== 'recording') {
+            try {
+                mediaRecorder.start(30000); // Capture in 30-second chunks
+>>>>>>> 6bd70aa5ace8f821e53980252cccfcfebeb2212d
                 isRecording = true;
                 console.log('Recording started');
             } catch (err) {
@@ -662,17 +953,36 @@
             }
         }
     }
+<<<<<<< HEAD
 
     function recordViolation(violationType) {
         warningCount++;
         const timestamp = new Date().toISOString();
+=======
+    
+    // Record a violation
+    function recordViolation(violationType) {
+        warningCount++;
+        const timestamp = new Date().toISOString();
+        
+>>>>>>> 6bd70aa5ace8f821e53980252cccfcfebeb2212d
         const violation = {
             time: timestamp,
             type: violationType,
             examTime: examDuration - timeLeft,
         };
+<<<<<<< HEAD
         violationLog.push(violation);
         console.log('Violation recorded:', violation);
+=======
+        
+        violationLog.push(violation);
+        
+        // In production, you would send this to server
+        console.log('Violation recorded:', violation);
+        
+        // Show warning for significant violations
+>>>>>>> 6bd70aa5ace8f821e53980252cccfcfebeb2212d
         if (violationType.includes('navigation') || 
             violationType.includes('reload') || 
             violationType.includes('fullscreen') ||
@@ -680,25 +990,51 @@
             showWarning('Security violation detected: ' + violationType);
         }
     }
+<<<<<<< HEAD
+=======
+    
+    // Show warning message
+>>>>>>> 6bd70aa5ace8f821e53980252cccfcfebeb2212d
     function showWarning(message) {
         const warning = document.getElementById('warning-message');
         warning.textContent = message;
         warning.style.display = 'block';
+<<<<<<< HEAD
+=======
+        
+>>>>>>> 6bd70aa5ace8f821e53980252cccfcfebeb2212d
         setTimeout(() => {
             warning.style.display = 'none';
         }, 4000);
     }
+<<<<<<< HEAD
+=======
+    
+    // Timer functionality
+>>>>>>> 6bd70aa5ace8f821e53980252cccfcfebeb2212d
     function startTimer() {
         const timerElement = document.getElementById('examTimer');
         const interval = setInterval(() => {
             const minutes = Math.floor(timeLeft / 60);
             const seconds = timeLeft % 60;
             timerElement.textContent = `Time Left: ${minutes}:${seconds < 10 ? '0' + seconds : seconds}`;
+<<<<<<< HEAD
             updateProgress();
             if (timeLeft <= 300) {
                 timerElement.style.backgroundColor = '#dc3545';
                 timerElement.style.animation = 'blink 1s infinite';
             }
+=======
+            
+            // Update progress bar for time
+            updateProgress();
+            
+            if (timeLeft <= 300) { // Last 5 minutes
+                timerElement.style.backgroundColor = '#dc3545';
+                timerElement.style.animation = 'blink 1s infinite';
+            }
+            
+>>>>>>> 6bd70aa5ace8f821e53980252cccfcfebeb2212d
             if (timeLeft <= 0) {
                 clearInterval(interval);
                 submitExam();
@@ -706,10 +1042,16 @@
             timeLeft--;
         }, 1000);
     }
+<<<<<<< HEAD
+=======
+    
+    // Update progress bar
+>>>>>>> 6bd70aa5ace8f821e53980252cccfcfebeb2212d
     function updateProgress() {
         const totalQuestions = document.querySelectorAll('.question-block').length;
         const answeredQuestions = document.querySelectorAll('input[type="radio"]:checked').length;
         const progressPercentage = (answeredQuestions / totalQuestions) * 100;
+<<<<<<< HEAD
         document.getElementById('examProgress').style.width = `${progressPercentage}%`;
         document.getElementById('examProgress').setAttribute('aria-valuenow', progressPercentage);
     }
@@ -717,19 +1059,42 @@
     function trackUserActivity() {
         let lastActivity = Date.now();
         
+=======
+        
+        document.getElementById('examProgress').style.width = `${progressPercentage}%`;
+        document.getElementById('examProgress').setAttribute('aria-valuenow', progressPercentage);
+    }
+    
+    // Track user activity
+    function trackUserActivity() {
+        let lastActivity = Date.now();
+        
+        // Update last activity time
+>>>>>>> 6bd70aa5ace8f821e53980252cccfcfebeb2212d
         const updateActivity = () => {
             lastActivity = Date.now();
             document.getElementById('activityLog').textContent = 'Activity Monitoring: Active';
         };
         
+<<<<<<< HEAD
         setInterval(() => {
             const inactiveTime = (Date.now() - lastActivity) / 1000;
             if (inactiveTime > 30) {
+=======
+        // Monitor inactivity
+        setInterval(() => {
+            const inactiveTime = (Date.now() - lastActivity) / 1000;
+            if (inactiveTime > 30) { // 30 seconds of inactivity
+>>>>>>> 6bd70aa5ace8f821e53980252cccfcfebeb2212d
                 document.getElementById('activityLog').textContent = 'Activity Monitoring: Inactive!';
                 recordViolation('Inactivity detected');
             }
         }, 5000);
         
+<<<<<<< HEAD
+=======
+        // Track connection status
+>>>>>>> 6bd70aa5ace8f821e53980252cccfcfebeb2212d
         window.addEventListener('online', () => {
             document.getElementById('connectionStatus').textContent = 'Connection: Online';
         });
@@ -739,11 +1104,16 @@
             recordViolation('Connection lost');
         });
         
+<<<<<<< HEAD
+=======
+        // Track mouse movements and clicks
+>>>>>>> 6bd70aa5ace8f821e53980252cccfcfebeb2212d
         document.addEventListener('mousemove', updateActivity);
         document.addEventListener('click', updateActivity);
         document.addEventListener('keydown', updateActivity);
         document.addEventListener('scroll', updateActivity);
     }
+<<<<<<< HEAD
 
     function submitExam() {
         Swal.fire({
@@ -806,19 +1176,58 @@
         });
     }
 
+=======
+    
+    // Confirm submission
+    function confirmSubmission() {
+        return confirm('Are you sure you want to submit the exam? You cannot modify your answers after submission.');
+    }
+    
+    // Submit exam
+    function submitExam() {
+        // Stop recording
+        if (mediaRecorder && isRecording) {
+            mediaRecorder.stop();
+        }
+        
+        // Allow navigation for form submission
+        disableNavigation = false;
+        
+        // Submit the form
+        document.getElementById('examForm').submit();
+    }
+    
+    // Attempt to submit form on unload
+>>>>>>> 6bd70aa5ace8f821e53980252cccfcfebeb2212d
     window.addEventListener('unload', () => {
         if (mediaRecorder && isRecording) {
             mediaRecorder.stop();
         }
+<<<<<<< HEAD
         const formData = new FormData(document.getElementById('examForm'));
         navigator.sendBeacon('/submit-exam', formData);
     });
 
     if (window.performance && performance.navigation.type === performance.navigation.TYPE_RELOAD) {
+=======
+        
+        // Try to submit using sendBeacon API
+        const formData = new FormData(document.getElementById('examForm'));
+        navigator.sendBeacon('/submit-exam', formData);
+    });
+    
+    // Preserve persistent lockdown even if refreshed
+    if (window.performance && performance.navigation.type === performance.navigation.TYPE_RELOAD) {
+        // This is a reload - record violation
+>>>>>>> 6bd70aa5ace8f821e53980252cccfcfebeb2212d
         recordViolation('Page was refreshed');
         showWarning('Page refresh detected. This incident has been recorded.');
     }
 
+<<<<<<< HEAD
+=======
+    // Ensure complete initialization
+>>>>>>> 6bd70aa5ace8f821e53980252cccfcfebeb2212d
     if (document.readyState === "complete") {
         preventNavigation();
     } else {

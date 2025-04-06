@@ -1,4 +1,9 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+from __future__ import with_statement
+
+>>>>>>> 6bd70aa5ace8f821e53980252cccfcfebeb2212d
 =======
 from __future__ import with_statement
 
@@ -20,6 +25,7 @@ fileConfig(config.config_file_name)
 logger = logging.getLogger('alembic.env')
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 
 def get_engine():
     try:
@@ -40,19 +46,27 @@ def get_engine_url():
 
 =======
 >>>>>>> 6bd70aa5ace8f821e53980252cccfcfebeb2212d
+=======
+>>>>>>> 6bd70aa5ace8f821e53980252cccfcfebeb2212d
 # add your model's MetaData object here
 # for 'autogenerate' support
 # from myapp import mymodel
 # target_metadata = mymodel.Base.metadata
 <<<<<<< HEAD
+<<<<<<< HEAD
 config.set_main_option('sqlalchemy.url', get_engine_url())
 target_db = current_app.extensions['migrate'].db
 =======
+=======
+>>>>>>> 6bd70aa5ace8f821e53980252cccfcfebeb2212d
 config.set_main_option(
     'sqlalchemy.url',
     str(current_app.extensions['migrate'].db.get_engine().url).replace(
         '%', '%%'))
 target_metadata = current_app.extensions['migrate'].db.metadata
+<<<<<<< HEAD
+>>>>>>> 6bd70aa5ace8f821e53980252cccfcfebeb2212d
+=======
 >>>>>>> 6bd70aa5ace8f821e53980252cccfcfebeb2212d
 
 # other values from the config, defined by the needs of env.py,
@@ -62,12 +76,15 @@ target_metadata = current_app.extensions['migrate'].db.metadata
 
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 def get_metadata():
     if hasattr(target_db, 'metadatas'):
         return target_db.metadatas[None]
     return target_db.metadata
 
 
+=======
+>>>>>>> 6bd70aa5ace8f821e53980252cccfcfebeb2212d
 =======
 >>>>>>> 6bd70aa5ace8f821e53980252cccfcfebeb2212d
 def run_migrations_offline():
@@ -85,7 +102,11 @@ def run_migrations_offline():
     url = config.get_main_option("sqlalchemy.url")
     context.configure(
 <<<<<<< HEAD
+<<<<<<< HEAD
         url=url, target_metadata=get_metadata(), literal_binds=True
+=======
+        url=url, target_metadata=target_metadata, literal_binds=True
+>>>>>>> 6bd70aa5ace8f821e53980252cccfcfebeb2212d
 =======
         url=url, target_metadata=target_metadata, literal_binds=True
 >>>>>>> 6bd70aa5ace8f821e53980252cccfcfebeb2212d
@@ -114,6 +135,7 @@ def run_migrations_online():
                 logger.info('No changes in schema detected.')
 
 <<<<<<< HEAD
+<<<<<<< HEAD
     conf_args = current_app.extensions['migrate'].configure_args
     if conf_args.get("process_revision_directives") is None:
         conf_args["process_revision_directives"] = process_revision_directives
@@ -122,13 +144,22 @@ def run_migrations_online():
 =======
     connectable = current_app.extensions['migrate'].db.get_engine()
 >>>>>>> 6bd70aa5ace8f821e53980252cccfcfebeb2212d
+=======
+    connectable = current_app.extensions['migrate'].db.get_engine()
+>>>>>>> 6bd70aa5ace8f821e53980252cccfcfebeb2212d
 
     with connectable.connect() as connection:
         context.configure(
             connection=connection,
 <<<<<<< HEAD
+<<<<<<< HEAD
             target_metadata=get_metadata(),
             **conf_args
+=======
+            target_metadata=target_metadata,
+            process_revision_directives=process_revision_directives,
+            **current_app.extensions['migrate'].configure_args
+>>>>>>> 6bd70aa5ace8f821e53980252cccfcfebeb2212d
 =======
             target_metadata=target_metadata,
             process_revision_directives=process_revision_directives,
