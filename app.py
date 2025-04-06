@@ -6,6 +6,7 @@ from flask_mail import Mail
 from email_utils import send_email
 import config
 import bcrypt
+from datetime import datetime, timedelta
 import csv
 import io
 from werkzeug.utils import secure_filename
@@ -79,7 +80,7 @@ def login():
             print("AFter login user id is:", user_id)
 
             # Redirect based on role
-            return redirect(url_for(f"{role.lower()}_dashboard", user_id= user_id))
+            return redirect(url_for(f"dashboard", user_id= user_id))
 
         flash('Invalid credentials or role', 'danger')
         return redirect(url_for('login'))
@@ -470,6 +471,164 @@ def student_dashboard():
     return render_template('pages/student_dashboard.html')
     # return render_template("pages/student_dashboard.html")
 
+@app.route("/dashboard/")
+def dashboard():
+    if 'role' not in session:
+        flash("Please log in to access the portal", "danger")
+        return redirect(url_for('login'))
+
+    role = session['role']
+    current_date = datetime.utcnow()
+
+    # Common data
+    upcoming_events = Event.query.filter(Event.event_date >= current_date).order_by(Event.event_date.asc()).limit(5).all()
+    
+    # Initialize chart_data with default empty values
+    chart_data = {
+        'labels': [],
+        'values1': [],
+        'values2': []
+    }
+    
+    if role == 'Admin':
+        teacher_count = Teacher.query.count()
+        student_count = Student.query.count()
+        event_count = Event.query.count()
+        
+        # Get department statistics for teachers
+        departments = db.session.query(
+            Teacher.department, 
+            db.func.count(Teacher.id)
+        ).group_by(Teacher.department).all()
+        
+        # Get department statistics for students
+        student_departments = db.session.query(
+            Student.department, 
+            db.func.count(Student.id)
+        ).group_by(Student.department).all()
+        
+        # Format the data for charts
+        dept_names = [dept[0] for dept in departments]
+        teacher_counts = [int(dept[1]) for dept in departments]
+        
+        # Create a mapping of departments to student counts
+        student_dept_map = {dept[0]: int(dept[1]) for dept in student_departments}
+        
+        # Get student counts for the same departments as teachers
+        student_counts = [student_dept_map.get(dept, 0) for dept in dept_names]
+        
+        chart_data = {
+            'labels': dept_names,
+            'values1': teacher_counts,
+            'values2': student_counts,
+            'title': 'Department Distribution',
+            'label1': 'Teachers',
+            'label2': 'Students'
+        }
+            
+        return render_template('pages/dashboard.html', role=role, teacher_count=teacher_count, 
+                            student_count=student_count, event_count=event_count, 
+                            upcoming_events=upcoming_events, chart_data=chart_data)
+
+    elif role == 'Teacher':
+        student_count = Student.query.count()
+        event_count = Event.query.count()
+        exam_count = Exam.query.count()
+        
+        # Get event types distribution
+        event_types = db.session.query(
+            Event.event_type, 
+            db.func.count(Event.id)
+        ).group_by(Event.event_type).all()
+        
+        # Get question banks by difficulty
+        question_banks = db.session.query(
+            Question_Banks.difficulty, 
+            db.func.count(Question_Banks.id)
+        ).group_by(Question_Banks.difficulty).all()
+        
+        # Format for charts
+        event_type_labels = [et[0] if et[0] else 'Undefined' for et in event_types]
+        event_type_counts = [int(et[1]) for et in event_types]
+        
+        # Use either event types or question bank difficulty based on what has more data
+        if len(event_types) >= len(question_banks) and len(event_types) > 0:
+            chart_data = {
+                'labels': event_type_labels,
+                'values1': event_type_counts,
+                'values2': [],
+                'title': 'Event Type Distribution',
+                'label1': 'Events',
+                'label2': ''
+            }
+        elif len(question_banks) > 0:
+            chart_data = {
+                'labels': [qb[0] for qb in question_banks],
+                'values1': [int(qb[1]) for qb in question_banks],
+                'values2': [],
+                'title': 'Question Bank Difficulty Distribution',
+                'label1': 'Question Banks',
+                'label2': ''
+            }
+        
+        return render_template('pages/dashboard.html', role=role, student_count=student_count, 
+                            event_count=event_count, exam_count=exam_count, 
+                            upcoming_events=upcoming_events, chart_data=chart_data)
+
+    elif role == 'Student':
+        event_count = Event.query.count()
+        exam_count = Exam.query.count()
+        logged_in_count = User.query.filter_by(role='Student').count()
+        
+        # Get upcoming events by type (next 30 days)
+        thirty_days_later = current_date + timedelta(days=30)
+
+        upcoming_event_types = db.session.query(
+            Event.event_type, 
+            db.func.count(Event.id)
+        ).filter(
+            Event.event_date >= current_date,
+            Event.event_date <= thirty_days_later
+        ).group_by(Event.event_type).all()
+        
+        # Get exam statistics if available
+        exams_with_question_banks = db.session.query(
+            Question_Banks.difficulty, 
+            db.func.count(Exam.id)
+        ).join(
+            Exam, 
+            Exam.question_bank_id == Question_Banks.id
+        ).group_by(Question_Banks.difficulty).all()
+        
+        # Format for charts - prioritize exam data if available
+        if len(exams_with_question_banks) > 0:
+            chart_data = {
+                'labels': [ewqb[0] for ewqb in exams_with_question_banks],
+                'values1': [int(ewqb[1]) for ewqb in exams_with_question_banks],
+                'values2': [],
+                'title': 'Upcoming Exam Difficulty Distribution',
+                'label1': 'Exams',
+                'label2': ''
+            }
+        elif len(upcoming_event_types) > 0:
+            chart_data = {
+                'labels': [uet[0] if uet[0] else 'Undefined' for uet in upcoming_event_types],
+                'values1': [int(uet[1]) for uet in upcoming_event_types],
+                'values2': [],
+                'title': 'Upcoming Events (Next 30 Days)',
+                'label1': 'Events',
+                'label2': ''
+            }
+            
+        return render_template('pages/dashboard.html', role=role, event_count=event_count, 
+                            exam_count=exam_count, logged_in_count=logged_in_count, 
+                            upcoming_events=upcoming_events, chart_data=chart_data)
+
+    else:
+        flash("Invalid role", "danger")
+        return redirect(url_for('login'))
+
+    
 
 @app.route('/download_csv_template')
 def download_csv_template():
